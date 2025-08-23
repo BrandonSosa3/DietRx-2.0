@@ -1,0 +1,12 @@
+# Virtual environment
+venv/
+
+# Python
+__pycache__/
+*.pyc
+
+# Env files
+.env
+
+# macOS
+.DS_Store
