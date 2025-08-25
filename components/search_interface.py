@@ -87,24 +87,15 @@ class SearchInterface:
             if selected_med not in st.session_state.selected_medications:
                 st.session_state.selected_medications.append(selected_med)
                 self.add_to_search_history(selected_med, 'medications')
+                st.rerun()
             else:
                 st.warning(f"'{selected_med}' is already selected!")
         
-        # Display selected medications
+        # Display selected medications (NO REMOVE BUTTONS)
         if st.session_state.selected_medications:
             st.write("**Selected Medications:**")
-            
-            for idx, med in enumerate(st.session_state.selected_medications):
-                col1, col2 = st.columns([0.85, 0.15])
-                
-                with col1:
-                    st.write(f"• **{med}**")
-                
-                with col2:
-                    if st.button("❌", key=f"remove_med_{med.replace(' ', '_')}_{idx}", help="Remove"):
-                        # Create new list without this medication
-                        st.session_state.selected_medications = [m for m in st.session_state.selected_medications if m != med]
-                        st.rerun()
+            for med in st.session_state.selected_medications:
+                st.write(f"• **{med}**")
         
         return selected_med
     
@@ -126,54 +117,17 @@ class SearchInterface:
             if selected_food not in st.session_state.selected_foods:
                 st.session_state.selected_foods.append(selected_food)
                 self.add_to_search_history(selected_food, 'foods')
+                st.rerun()
             else:
                 st.warning(f"'{selected_food}' is already selected!")
         
-        # Display selected foods
+        # Display selected foods (NO REMOVE BUTTONS)
         if st.session_state.selected_foods:
             st.write("**Selected Foods:**")
-            
-            for idx, food in enumerate(st.session_state.selected_foods):
-                col1, col2 = st.columns([0.85, 0.15])
-                
-                with col1:
-                    st.write(f"• **{food}**")
-                
-                with col2:
-                    if st.button("❌", key=f"remove_food_{food.replace(' ', '_')}_{idx}", help="Remove"):
-                        # Create new list without this food
-                        st.session_state.selected_foods = [f for f in st.session_state.selected_foods if f != food]
-                        st.rerun()
+            for food in st.session_state.selected_foods:
+                st.write(f"• **{food}**")
         
         return selected_food
-
-
-
-    def render_remove_section(self):
-        """Render a simple section to remove individual items"""
-        if not (st.session_state.selected_medications or st.session_state.selected_foods):
-            return
-        
-        st.markdown("---")
-        st.subheader("🗑️ Remove Items")
-        
-        # Remove medications
-        if st.session_state.selected_medications:
-            st.write("**Remove Medications:**")
-            for med in st.session_state.selected_medications:
-                if st.button(f"Remove {med}", key=f"remove_{med}"):
-                    st.session_state.selected_medications.remove(med)
-                    st.success(f"Removed {med}")
-                    st.rerun()
-        
-        # Remove foods
-        if st.session_state.selected_foods:
-            st.write("**Remove Foods:**")
-            for food in st.session_state.selected_foods:
-                if st.button(f"Remove {food}", key=f"remove_{food}"):
-                    st.session_state.selected_foods.remove(food)
-                    st.success(f"Removed {food}")
-                    st.rerun()
     
     def render_batch_input(self):
         """Render batch input interface"""
@@ -249,45 +203,6 @@ class SearchInterface:
                         if added_count > 0:
                             st.success(f"Added {added_count} foods!")
                             st.rerun()
-    
-    def render_clear_buttons(self):
-        """Render clear/reset buttons"""
-        st.markdown("### 🗑️ Clear Selections")
-        
-        # Debug info
-        st.write("**Debug Info:**")
-        st.write(f"Medications count: {len(st.session_state.selected_medications)}")
-        st.write(f"Foods count: {len(st.session_state.selected_foods)}")
-        
-        col1, col2, col3 = st.columns(3)
-        
-        with col1:
-            if st.session_state.selected_medications:
-                if st.button("Clear Medications", key="clear_meds"):
-                    st.session_state.selected_medications = []
-                    st.write("✅ Medications cleared!")
-                    st.rerun()
-            else:
-                st.button("Clear Medications", disabled=True, key="clear_meds_disabled")
-        
-        with col2:
-            if st.session_state.selected_foods:
-                if st.button("Clear Foods", key="clear_foods"):
-                    st.session_state.selected_foods = []
-                    st.write("✅ Foods cleared!")
-                    st.rerun()
-            else:
-                st.button("Clear Foods", disabled=True, key="clear_foods_disabled")
-        
-        with col3:
-            if st.session_state.selected_medications or st.session_state.selected_foods:
-                if st.button("Clear All", key="clear_all"):
-                    st.session_state.selected_medications = []
-                    st.session_state.selected_foods = []
-                    st.write("✅ All cleared!")
-                    st.rerun()
-            else:
-                st.button("Clear All", disabled=True, key="clear_all_disabled")
     
     def get_selected_items(self) -> Tuple[List[str], List[str]]:
         """Get currently selected medications and foods"""

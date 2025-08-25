@@ -287,11 +287,8 @@ class DietRxApp:
         
         st.markdown("---")
         
-        # Food search (full width)
+        # Food search (full width)  
         search_interface.render_food_search()
-        
-        # Simple remove section
-        search_interface.render_remove_section()
         
         # Analysis section
         st.markdown("---")
@@ -302,10 +299,52 @@ class DietRxApp:
             st.subheader("🔍 Ready for Analysis")
             st.write(f"**Selected:** {len(medications)} medications, {len(foods)} foods")
             
+            # Add a simple "Start Over" button as the only clear option
+            if st.button("🔄 Start Over (Clear All)", type="secondary", key="start_over"):
+                st.session_state.selected_medications = []
+                st.session_state.selected_foods = []
+                st.success("✅ Cleared all selections")
+                st.rerun()
+            
             # Big analyze button
             if st.button("🚀 Analyze Interactions", type="primary", key="analyze_button"):
                 self.perform_interaction_analysis(components, medications, foods)
-        else:
+        
+        # Show previous results if they exist (keep this part)
+        if 'analysis_results' in st.session_state:
+            st.markdown("---")
+            st.subheader("📊 Latest Analysis Results")
+            
+            # Show what was analyzed
+            meds_analyzed = st.session_state.get('analysis_medications', [])
+            foods_analyzed = st.session_state.get('analysis_foods', [])
+            
+            col1, col2 = st.columns(2)
+            with col1:
+                if meds_analyzed:
+                    st.write("**Medications analyzed:**")
+                    for med in meds_analyzed:
+                        st.write(f"• {med}")
+            
+            with col2:
+                if foods_analyzed:
+                    st.write("**Foods analyzed:**")
+                    for food in foods_analyzed:
+                        st.write(f"• {food}")
+            
+            # Display the stored results
+            self.display_analysis_results(st.session_state.analysis_results)
+            
+            # Clear results button
+            if st.button("🗑️ Clear Results", type="secondary", key="clear_results_unique"):
+                del st.session_state.analysis_results
+                if 'analysis_medications' in st.session_state:
+                    del st.session_state.analysis_medications
+                if 'analysis_foods' in st.session_state:
+                    del st.session_state.analysis_foods
+                st.rerun()
+        
+        elif not search_interface.has_selections():
             st.info("👆 **Start by selecting medications and foods above to check for interactions.**")
 
 
@@ -462,35 +501,63 @@ class DietRxApp:
         logging.info(f"Performance: {operation_name} - {duration:.2f}s")
 
     def perform_interaction_analysis(self, components, medications: List[str], foods: List[str]):
-        """Perform the actual interaction analysis with debugging"""
+        """Perform the actual interaction analysis with error handling and monitoring"""
         
-        # DEBUG: Show what we're searching for
-        st.write("**DEBUG INFO:**")
-        st.write(f"Searching for medications: {medications}")
-        st.write(f"Searching for foods: {foods}")
+        # Validate selections first
+        search_interface = components['search_interface']
+        is_valid, validation_msg = search_interface.validate_selections()
         
-        # Check database directly
-        db = components['db_manager']
-        direct_lookup = db.find_interactions(medications, foods)
-        st.write(f"Direct database lookup found: {len(direct_lookup)} interactions")
-        for interaction in direct_lookup:
-            st.write(f"• Found: {interaction['medication_name']} + {interaction['food_name']} = {interaction['severity']}")
+        if not is_valid:
+            st.error(f"❌ {validation_msg}")
+            return
         
-        # Continue with normal analysis...
+        # Show selection warnings
+        search_interface.display_selection_warnings()
+        
         interaction_engine = components['interaction_engine']
         
         try:
             start_time = time.time()
             
             with st.spinner("🔍 Analyzing interactions..."):
-                results = interaction_engine.analyze_interactions(medications, foods)
+                # Perform the analysis
+                results = ErrorHandler.safe_execute(
+                    lambda: interaction_engine.analyze_interactions(medications, foods),
+                    fallback_value=None,
+                    error_message="Analysis engine encountered an error"
+                )
                 
-                # Display results
-                self.display_analysis_results(results)
+                if results is None:
+                    st.error("❌ Analysis failed. Please try again or contact support.")
+                    return
+                
+                # Monitor performance
+                self.monitor_performance("Interaction Analysis", start_time)
+                
+                # ONLY store results in session state - don't display them here
+                st.session_state.analysis_results = results
+                st.session_state.analysis_medications = medications
+                st.session_state.analysis_foods = foods
+                
+                # REMOVE THIS LINE - don't display results here
+                # self.display_analysis_results(results)  # <-- REMOVE THIS
+                
+                # Just show success message and let render_search_page handle display
+                st.success("✅ Analysis completed! Results displayed below.")
+                st.rerun()  # Refresh to show the results
+                
+                # Log successful analysis
+                logging.info(f"Successful analysis: {len(medications)} meds, {len(foods)} foods, {len(results.interactions)} interactions")
                 
         except Exception as e:
-            st.error(f"❌ Error during analysis: {e}")
-            logging.error(f"Analysis error: {e}")
+            st.error(f"❌ Critical error during analysis: {str(e)}")
+            logging.error(f"Critical analysis error: {e}")
+            
+            # Offer fallback options
+            st.info("💡 You can try:")
+            st.write("• Reducing the number of selected items")
+            st.write("• Refreshing the page and trying again")
+            st.write("• Contacting support if the problem persists")
 
 
     def render_database_viewer_page(self, components):

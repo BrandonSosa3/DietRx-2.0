@@ -335,75 +335,61 @@ class ResultsDisplay:
                 st.write(rec)
     
     def _display_export_options(self, results: AnalysisResults, analytics_data: Optional[Dict] = None):
-        """Display enhanced export and sharing options including PDF generation"""
+        """Display export and sharing options including PDF generation"""
         st.subheader("📤 Export & Share Results")
         
-        # Create PDF generator instance
-        pdf_generator = PDFReportGenerator()
+        # Simple success message for testing
+        st.info("🧪 **PDF Generation Test Mode** - Results are now persisted!")
         
         col1, col2, col3, col4 = st.columns(4)
         
         with col1:
-            # Generate comprehensive PDF report
-            if st.button("📄 Full PDF Report", type="primary", help="Generate comprehensive PDF report"):
-                try:
-                    with st.spinner("🔄 Generating comprehensive PDF report..."):
-                        pdf_bytes = pdf_generator.generate_comprehensive_report(results, analytics_data)
-                        self._download_pdf_report(pdf_bytes, results, "comprehensive")
-                    st.success("✅ PDF report generated successfully!")
-                except Exception as e:
-                    st.error(f"❌ Error generating PDF report: {e}")
-                    logging.error(f"PDF generation error: {e}")
+            # Simpler test - just show the download button directly
+            try:
+                from utils.pdf_generator import PDFReportGenerator
+                pdf_generator = PDFReportGenerator()
+                pdf_bytes = pdf_generator.generate_summary_report(results)
+                
+                st.download_button(
+                    label="📄 Download PDF Report",
+                    data=pdf_bytes,
+                    file_name=f"interaction_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf",
+                    mime="application/pdf",
+                    type="primary",
+                    key="download_pdf_report_unique"  # ADD UNIQUE KEY
+                )
+                st.success(f"✅ PDF ready! ({len(pdf_bytes)} bytes)")
+                
+            except Exception as e:
+                st.error(f"❌ PDF Error: {str(e)}")
+                # Show simple text download as fallback
+                report_text = self._generate_text_report(results)
+                st.download_button(
+                    label="📝 Download Text Report",
+                    data=report_text,
+                    file_name=f"interaction_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt",
+                    mime="text/plain",
+                    key="download_text_report_unique"  # ADD UNIQUE KEY
+                )
         
         with col2:
-            # Generate summary PDF report
-            if st.button("📋 Summary PDF", type="secondary", help="Generate concise PDF summary"):
-                try:
-                    with st.spinner("🔄 Generating PDF summary..."):
-                        pdf_bytes = pdf_generator.generate_summary_report(results)
-                        self._download_pdf_report(pdf_bytes, results, "summary")
-                    st.success("✅ PDF summary generated!")
-                except Exception as e:
-                    st.error(f"❌ Error generating PDF summary: {e}")
-                    logging.error(f"PDF summary error: {e}")
-        
-        '''with col3:
-            # Export as JSON
-            if st.button("💾 Export JSON", type="secondary"):
+            # JSON export
+            if st.button("💾 Export JSON", type="secondary", key="export_json_unique"):  # ADD UNIQUE KEY
                 json_data = self._generate_json_export(results)
-                self._download_json_export(json_data, results)'''
+                self._download_json_export(json_data, results)
         
-        with col4:
-            # Copy summary to clipboard
-            if st.button("📋 Copy Summary", type="secondary"):
+        with col3:
+            # Copy summary
+            if st.button("📋 Copy Summary", type="secondary", key="copy_summary_unique"):  # ADD UNIQUE KEY
                 summary_text = self._generate_summary_text(results)
                 st.code(summary_text, language="text")
                 st.success("Summary ready to copy!")
         
-        # Advanced export options
-        with st.expander("🔧 Advanced Export Options"):
-            
-            col_a, col_b, col_c = st.columns(3)
-            
-            with col_a:
-                # Generate text report
-                if st.button("📝 Text Report", help="Generate detailed text report"):
-                    report_text = self._generate_text_report(results)
-                    self._download_text_report(report_text, results)
-            
-            with col_b:
-                # Print-friendly version
-                if st.button("🖨️ Print Version", help="Display print-friendly format"):
-                    self._display_print_version(results)
-            
-            with col_c:
-                # Email-ready summary
-                if st.button("📧 Email Format", help="Generate email-friendly summary"):
-                    self._display_email_format(results)
-        
-        # PDF Preview section
-        if st.checkbox("👀 Preview PDF Content", help="Show what will be included in PDF reports"):
-            self._display_pdf_preview(results, analytics_data)
+        with col4:
+            st.write("**Export Status:**")
+            st.write(f"✅ Results stored")
+            st.write(f"📊 {len(results.interactions)} interactions")
+            st.write(f"🎯 {results.overall_risk_level.value}")
 
     def _download_pdf_report(self, pdf_bytes: bytes, results: AnalysisResults, report_type: str):
         """Provide download link for PDF report"""
