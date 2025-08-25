@@ -1,6 +1,4 @@
 import requests
-import asyncio
-import aiohttp
 import logging
 from typing import List, Dict, Optional, Union
 import time
