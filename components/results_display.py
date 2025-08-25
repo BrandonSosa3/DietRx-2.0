@@ -83,7 +83,7 @@ class ResultsDisplay:
     
     def _display_metrics_dashboard(self, results: AnalysisResults):
         """Display key metrics in a dashboard format"""
-        st.subheader("📊 Analysis Overview")
+        st.subheader("Analysis Overview")
         
         # Calculate metrics
         total_interactions = len(results.interactions)
@@ -103,7 +103,7 @@ class ResultsDisplay:
         
         with col2:
             st.metric(
-                "🔴 Critical",
+                "Critical",
                 avoid_count,
                 delta=f"-{avoid_count}" if avoid_count > 0 else None,
                 delta_color="inverse",
@@ -112,7 +112,7 @@ class ResultsDisplay:
         
         with col3:
             st.metric(
-                "🟡 Caution",
+                "Caution",
                 caution_count,
                 delta=f"±{caution_count}" if caution_count > 0 else None,
                 delta_color="off",
@@ -121,7 +121,7 @@ class ResultsDisplay:
         
         with col4:
             st.metric(
-                "🟢 Safe",
+                "Safe",
                 safe_count,
                 delta=f"+{safe_count}" if safe_count > 0 else None,
                 delta_color="normal",
@@ -138,7 +138,7 @@ class ResultsDisplay:
     
     def _display_ai_analysis(self, ai_analysis):
         """Display AI analysis in an attractive format"""
-        with st.expander("🤖 AI-Enhanced Analysis", expanded=True):
+        with st.expander("AI-Enhanced Analysis", expanded=True):
             
             # AI metrics
             col1, col2, col3 = st.columns(3)
@@ -151,18 +151,18 @@ class ResultsDisplay:
                 st.metric("Processing Time", f"{ai_analysis.processing_time:.2f}s")
             
             # AI explanation
-            st.markdown("### 🧠 AI Explanation")
+            st.markdown("AI Explanation")
             st.info(ai_analysis.detailed_explanation)
             
             # AI warnings
             if ai_analysis.additional_warnings:
-                st.markdown("### ⚠️ AI-Identified Warnings")
+                st.markdown("AI-Identified Warnings")
                 for warning in ai_analysis.additional_warnings:
                     st.warning(f"• {warning}")
     
     def _display_interaction_chart(self, interactions: List[InteractionResult]):
         """Create an interactive chart of interactions"""
-        st.subheader("📈 Interaction Visualization")
+        st.subheader("Interaction Visualization")
         
         if not interactions:
             return
@@ -227,10 +227,10 @@ class ResultsDisplay:
     def _display_interaction_cards(self, interactions: List[InteractionResult]):
         """Display detailed interaction cards"""
         if not interactions:
-            st.success("✅ No significant interactions found!")
+            st.success("No significant interactions found!")
             return
         
-        st.subheader("🔬 Detailed Interaction Analysis")
+        st.subheader("Detailed Interaction Analysis")
         
         # Group interactions by severity
         grouped_interactions = {
@@ -266,17 +266,17 @@ class ResultsDisplay:
             col1, col2 = st.columns([2, 1])
             
             with col1:
-                st.markdown("**🔬 Clinical Details:**")
+                st.markdown("Clinical Details:**")
                 st.write(f"**Mechanism:** {interaction.mechanism}")
                 st.write(f"**Clinical Effect:** {interaction.clinical_effect}")
                 st.write(f"**Interaction Type:** {interaction.interaction_type.value.title()}")
                 
                 if interaction.timing_recommendation:
-                    st.markdown("**⏰ Timing Guidance:**")
+                    st.markdown("**Timing Guidance:**")
                     st.success(interaction.timing_recommendation)
             
             with col2:
-                st.markdown("**📊 Evidence Quality:**")
+                st.markdown("**Evidence Quality:**")
                 st.write(f"**Evidence Level:** {interaction.evidence_level.title()}")
                 st.write(f"**Confidence:** {int(interaction.confidence * 100)}%")
                 st.write(f"**Source:** {interaction.source}")
@@ -295,7 +295,7 @@ class ResultsDisplay:
         if not recommendations:
             return
         
-        st.subheader("💡 Personalized Recommendations")
+        st.subheader("Personalized Recommendations")
         
         # Categorize recommendations
         critical_recs = []
@@ -315,31 +315,28 @@ class ResultsDisplay:
         
         # Display by priority
         if critical_recs:
-            st.markdown("#### 🚨 Immediate Action Required")
+            st.markdown("Immediate Action Required")
             for rec in critical_recs:
                 st.error(rec)
         
         if warning_recs:
-            st.markdown("#### ⚠️ Important Precautions")
+            st.markdown("Important Precautions")
             for rec in warning_recs:
                 st.warning(rec)
         
         if info_recs:
-            st.markdown("#### 📋 General Guidance")
+            st.markdown("General Guidance")
             for rec in info_recs:
                 st.info(rec)
         
         if general_recs:
-            st.markdown("#### 💭 Additional Notes")
+            st.markdown("Additional Notes")
             for rec in general_recs:
                 st.write(rec)
     
     def _display_export_options(self, results: AnalysisResults, analytics_data: Optional[Dict] = None):
         """Display export and sharing options including PDF generation"""
-        st.subheader("📤 Export & Share Results")
-        
-        # Simple success message for testing
-        st.info("🧪 **PDF Generation Test Mode** - Results are now persisted!")
+        st.subheader("Export & Share Results")
         
         col1, col2, col3, col4 = st.columns(4)
         
@@ -351,21 +348,21 @@ class ResultsDisplay:
                 pdf_bytes = pdf_generator.generate_summary_report(results)
                 
                 st.download_button(
-                    label="📄 Download PDF Report",
+                    label="Download PDF Report",
                     data=pdf_bytes,
                     file_name=f"interaction_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf",
                     mime="application/pdf",
                     type="primary",
                     key="download_pdf_report_unique"  # ADD UNIQUE KEY
                 )
-                st.success(f"✅ PDF ready! ({len(pdf_bytes)} bytes)")
+                st.success(f"PDF ready! ({len(pdf_bytes)} bytes)")
                 
             except Exception as e:
-                st.error(f"❌ PDF Error: {str(e)}")
+                st.error(f"PDF Error: {str(e)}")
                 # Show simple text download as fallback
                 report_text = self._generate_text_report(results)
                 st.download_button(
-                    label="📝 Download Text Report",
+                    label="Download Text Report",
                     data=report_text,
                     file_name=f"interaction_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt",
                     mime="text/plain",
@@ -374,22 +371,22 @@ class ResultsDisplay:
         
         with col2:
             # JSON export
-            if st.button("💾 Export JSON", type="secondary", key="export_json_unique"):  # ADD UNIQUE KEY
+            if st.button("Export JSON", type="secondary", key="export_json_unique"):  # ADD UNIQUE KEY
                 json_data = self._generate_json_export(results)
                 self._download_json_export(json_data, results)
         
         with col3:
             # Copy summary
-            if st.button("📋 Copy Summary", type="secondary", key="copy_summary_unique"):  # ADD UNIQUE KEY
+            if st.button("Copy Summary", type="secondary", key="copy_summary_unique"):  # ADD UNIQUE KEY
                 summary_text = self._generate_summary_text(results)
                 st.code(summary_text, language="text")
                 st.success("Summary ready to copy!")
         
         with col4:
             st.write("**Export Status:**")
-            st.write(f"✅ Results stored")
-            st.write(f"📊 {len(results.interactions)} interactions")
-            st.write(f"🎯 {results.overall_risk_level.value}")
+            st.write(f"Results stored")
+            st.write(f"{len(results.interactions)} interactions")
+            st.write(f"Risk: {results.overall_risk_level.value}")
 
     def _download_pdf_report(self, pdf_bytes: bytes, results: AnalysisResults, report_type: str):
         """Provide download link for PDF report"""
@@ -401,7 +398,7 @@ class ResultsDisplay:
         
         # Create download button
         st.download_button(
-            label=f"📥 Download {report_type.title()} PDF",
+            label=f"Download {report_type.title()} PDF",
             data=pdf_bytes,
             file_name=filename,
             mime="application/pdf",
@@ -410,12 +407,12 @@ class ResultsDisplay:
         
         # Display file info
         file_size_mb = len(pdf_bytes) / (1024 * 1024)
-        st.info(f"📊 Report size: {file_size_mb:.1f} MB | Format: PDF | Type: {report_type.title()}")
+        st.info(f"Report size: {file_size_mb:.1f} MB | Format: PDF | Type: {report_type.title()}")
 
     def _display_pdf_preview(self, results: AnalysisResults, analytics_data: Optional[Dict]):
         """Display preview of what will be included in PDF reports"""
         
-        st.markdown("### 📋 PDF Report Content Preview")
+        st.markdown("PDF Report Content Preview")
         
         tab1, tab2 = st.tabs(["📄 Comprehensive Report", "📋 Summary Report"])
         
@@ -423,12 +420,12 @@ class ResultsDisplay:
             st.write("**Comprehensive PDF Report will include:**")
             
             sections = [
-                "🎯 **Title Page** - Report details, risk level, disclaimer",
-                "📊 **Executive Summary** - Key findings and AI analysis",
-                "🔬 **Detailed Analysis** - Complete interaction breakdown by severity",
-                "📈 **Visual Charts** - Severity distribution and drug class analysis",
-                "💡 **Clinical Recommendations** - Categorized by urgency and importance", 
-                "📚 **Technical Appendix** - Methodology, data sources, disclaimers"
+                "**Title Page** - Report details, risk level, disclaimer",
+                "**Executive Summary** - Key findings and AI analysis",
+                "**Detailed Analysis** - Complete interaction breakdown by severity",
+                "**Visual Charts** - Severity distribution and drug class analysis",
+                "**Clinical Recommendations** - Categorized by urgency and importance", 
+                "**Technical Appendix** - Methodology, data sources, disclaimers"
             ]
             
             for section in sections:
@@ -447,10 +444,10 @@ class ResultsDisplay:
             st.write("**Summary PDF Report will include:**")
             
             summary_sections = [
-                "📋 **Header** - Basic report information and risk level",
-                "📝 **Summary** - Condensed analysis overview", 
-                "⚡ **Key Interactions** - Top 5 most important interactions",
-                "💡 **Essential Recommendations** - Top 3 critical recommendations"
+                "**Header** - Basic report information and risk level",
+                "**Summary** - Condensed analysis overview", 
+                "**Key Interactions** - Top 5 most important interactions",
+                "**Essential Recommendations** - Top 3 critical recommendations"
             ]
             
             for section in summary_sections:
@@ -465,54 +462,6 @@ class ResultsDisplay:
             with col3:
                 st.metric("File Size", "~500 KB")
 
-    def _display_email_format(self, results: AnalysisResults):
-        """Display email-friendly summary format"""
-        
-        st.markdown("### 📧 Email-Friendly Summary")
-        
-        email_subject = f"Drug-Food Interaction Analysis - {results.overall_risk_level.value.upper()} Risk Level"
-        
-        email_body = f"""
-    **Subject:** {email_subject}
-
-    **Analysis Summary:**
-    {results.summary}
-
-    **Risk Level:** {results.overall_risk_level.value.upper()}
-    **Confidence:** {int(results.confidence_score * 100)}%
-    **Generated:** {datetime.now().strftime('%B %d, %Y at %I:%M %p')}
-
-    **Medications Analyzed:** {', '.join(results.medications_analyzed)}
-    **Foods Analyzed:** {', '.join(results.foods_analyzed)}
-    """
-        
-        if results.interactions:
-            email_body += f"\n**Key Interactions Found:**\n"
-            for i, interaction in enumerate(results.interactions[:3], 1):
-                email_body += f"{i}. {interaction.medication} + {interaction.food} ({interaction.severity.value})\n"
-        
-        if results.recommendations:
-            email_body += f"\n**Top Recommendations:**\n"
-            for i, rec in enumerate(results.recommendations[:3], 1):
-                clean_rec = rec.replace("🚨", "").replace("⚠️", "").replace("📞", "").replace("✅", "").replace("**", "").strip()
-                email_body += f"{i}. {clean_rec}\n"
-        
-        email_body += """
-    **Important:** This analysis is for informational purposes only. Always consult your healthcare provider before making changes to medications or diet.
-
-    Generated by DietRx Enhanced Analysis System
-    """
-        
-        st.text_area(
-            "Email content (ready to copy & paste):",
-            email_body,
-            height=400,
-            help="Copy this content to send via email to your healthcare provider"
-        )
-        
-        # Quick copy button
-        if st.button("📋 Copy Email Content"):
-            st.success("✅ Email content is displayed above - select all and copy!")
     
     def _generate_text_report(self, results: AnalysisResults) -> str:
         """Generate a comprehensive text report"""
@@ -592,7 +541,7 @@ class ResultsDisplay:
         filename = f"interaction_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
         
         st.download_button(
-            label="📥 Download Report",
+            label="Download Report",
             data=report_text,
             file_name=filename,
             mime="text/plain"
@@ -643,7 +592,7 @@ class ResultsDisplay:
         filename = f"interaction_data_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
         
         st.download_button(
-            label="📥 Download JSON",
+            label="Download JSON",
             data=json_data,
             file_name=filename,
             mime="application/json"
@@ -669,34 +618,10 @@ class ResultsDisplay:
         
         return "\n".join(summary_lines)
     
-    def _display_print_version(self, results: AnalysisResults):
-        """Display a clean print-friendly version"""
-        with st.expander("🖨️ Print-Friendly Report", expanded=True):
-            st.markdown("### Drug-Food Interaction Analysis")
-            st.write(f"**Date:** {datetime.now().strftime('%B %d, %Y')}")
-            st.write(f"**Risk Level:** {results.overall_risk_level.value.upper()}")
-            st.write(f"**Confidence:** {int(results.confidence_score * 100)}%")
-            
-            st.write(f"**Medications:** {', '.join(results.medications_analyzed)}")
-            st.write(f"**Foods:** {', '.join(results.foods_analyzed)}")
-            
-            st.write(f"**Summary:** {results.summary}")
-            
-            if results.interactions:
-                st.write("**Interactions:**")
-                for interaction in results.interactions:
-                    st.write(f"• {interaction.medication} + {interaction.food} ({interaction.severity.value})")
-                    st.write(f"  {interaction.mechanism}")
-            
-            st.write("**Recommendations:**")
-            for rec in results.recommendations:
-                st.write(f"• {rec}")
-            
-            st.write("*This analysis is for informational purposes only. Consult your healthcare provider.*")
     
     def _display_metadata(self, results: AnalysisResults):
         """Display analysis metadata"""
-        with st.expander("ℹ️ Analysis Details"):
+        with st.expander("Analysis Details"):
             col1, col2 = st.columns(2)
             
             with col1:
@@ -721,53 +646,9 @@ class ResultsDisplay:
                         st.write(f"  {severity.title()}: {count}")
 
 
-    def _display_feedback_section(self, results: AnalysisResults):
-        """Allow users to provide feedback on analysis quality"""
-        st.subheader("📝 Feedback")
-        
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            accuracy_rating = st.select_slider(
-                "How accurate did this analysis seem?",
-                options=["Very Poor", "Poor", "Fair", "Good", "Excellent"],
-                value="Good",
-                key="accuracy_rating"
-            )
-        
-        with col2:
-            usefulness_rating = st.select_slider(
-                "How useful were the recommendations?",
-                options=["Not Useful", "Slightly Useful", "Moderately Useful", "Very Useful", "Extremely Useful"],
-                value="Very Useful",
-                key="usefulness_rating"
-            )
-        
-        feedback_text = st.text_area(
-            "Additional feedback (optional):",
-            placeholder="Any specific suggestions or issues you encountered...",
-            key="feedback_text"
-        )
-        
-        if st.button("Submit Feedback", type="secondary"):
-            # Log feedback (in production, you'd save this to a database)
-            feedback_data = {
-                "accuracy": accuracy_rating,
-                "usefulness": usefulness_rating,
-                "text": feedback_text,
-                "medications": results.medications_analyzed,
-                "foods": results.foods_analyzed,
-                "interaction_count": len(results.interactions),
-                "timestamp": results.analysis_timestamp
-            }
-            
-            logging.info(f"User feedback received: {feedback_data}")
-            st.success("✅ Thank you for your feedback!")
-
-
     def display_app_status(self, components):
         """Display comprehensive app status"""
-        with st.expander("🏥 App Health Status"):
+        with st.expander("App Health Status"):
             
             # Component status
             st.write("**Component Status:**")
@@ -782,9 +663,9 @@ class ResultsDisplay:
             
             for component, status in status_checks:
                 if status:
-                    st.success(f"✅ {component}: Operational")
+                    st.success(f" {component}: Operational")
                 else:
-                    st.error(f"❌ {component}: Issues detected")
+                    st.error(f" {component}: Issues detected")
             
             # Performance metrics
             st.write("**Performance Metrics:**")

@@ -29,7 +29,7 @@ class AnalyticsDashboard:
         """Display the main analytics dashboard"""
         
         if not analytics_data or 'overview_stats' not in analytics_data:
-            st.error("❌ Analytics data not available")
+            st.error("Analytics data not available")
             return
         
         # Dashboard header
@@ -70,68 +70,69 @@ class AnalyticsDashboard:
         self.add_analytics_export_options(analytics_data)
     
     def _display_dashboard_header(self, overview_stats: Dict):
-        """Display impressive dashboard header"""
-        
+        """Display dashboard header"""
+
         st.markdown("""
         <div style="
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-color: #2C3E50;
             padding: 30px;
-            border-radius: 15px;
+            border-radius: 10px;
             color: white;
             text-align: center;
             margin-bottom: 30px;
         ">
-            <h1 style="margin: 0; font-size: 2.5em;">📊 Advanced Analytics Dashboard</h1>
-            <p style="margin: 10px 0 0 0; font-size: 1.2em; opacity: 0.9;">
+            <h1 style="margin: 0; font-size: 2.2em;">Advanced Analytics Dashboard</h1>
+            <p style="margin: 10px 0 0 0; font-size: 1.1em; opacity: 0.9;">
                 Comprehensive Drug-Food Interaction Analysis & Insights
             </p>
         </div>
         """, unsafe_allow_html=True)
-        
+
         # Key metrics overview
         col1, col2, col3, col4, col5 = st.columns(5)
-        
+
         with col1:
             st.metric(
-                "💊 Medications",
+                "Medications",
                 f"{overview_stats.get('total_medications', 0):,}",
                 help="Total medications in database"
             )
-        
+
         with col2:
             st.metric(
-                "🥗 Foods", 
+                "Foods", 
                 f"{overview_stats.get('total_foods', 0):,}",
                 help="Total foods in database"
             )
-        
+
         with col3:
             st.metric(
-                "⚡ Interactions",
+                "Interactions",
                 f"{overview_stats.get('total_interactions', 0):,}",
                 help="Known drug-food interactions"
             )
-        
+
         with col4:
             st.metric(
-                "🏥 Drug Classes",
+                "Drug Classes",
                 f"{overview_stats.get('drug_classes_count', 0):,}",
                 help="Therapeutic drug classes"
             )
-        
+
         with col5:
             coverage_rate = overview_stats.get('interaction_coverage_rate', 0)
             st.metric(
-                "📈 Coverage",
+                "Coverage",
                 f"{coverage_rate}%",
                 delta=f"{coverage_rate - 75:.1f}%" if coverage_rate >= 75 else None,
                 help="Interaction coverage rate"
             )
+
     
     def _display_kpi_section(self, analytics_data: Dict):
         """Display key performance indicators with advanced charts"""
         
-        st.subheader("🎯 Key Performance Indicators")
+        st.subheader(" Key Performance Indicators")
         
         # Severity distribution pie chart
         severity_data = analytics_data.get('severity_distribution', {})
@@ -162,7 +163,7 @@ class AnalyticsDashboard:
     def _display_system_health(self, analytics_data: Dict):
         """Display system health and data quality metrics"""
         
-        st.subheader("🏥 System Health")
+        st.subheader("System Health")
         
         # Data quality gauge
         quality_data = analytics_data.get('data_quality_metrics', {})
@@ -196,13 +197,13 @@ class AnalyticsDashboard:
         prediction_data = analytics_data.get('prediction_metrics', {})
         if prediction_data:
             st.metric(
-                "🎯 System Accuracy",
+                "System Accuracy",
                 f"{prediction_data.get('overall_system_accuracy', 0):.1%}",
                 help="Overall prediction accuracy"
             )
             
             st.metric(
-                "📊 Coverage Rate", 
+                "Coverage Rate", 
                 f"{prediction_data.get('prediction_coverage', 0):.1f}%",
                 help="Percentage of possible interactions covered"
             )
@@ -210,7 +211,7 @@ class AnalyticsDashboard:
     def _display_interaction_analysis_charts(self, analytics_data: Dict):
         """Display comprehensive interaction analysis charts"""
         
-        st.subheader("🔬 Interaction Pattern Analysis")
+        st.subheader("Interaction Pattern Analysis")
         
         col1, col2 = st.columns(2)
         
@@ -256,7 +257,7 @@ class AnalyticsDashboard:
         
         # Mechanism keyword analysis
         if pattern_data and 'mechanism_keywords' in pattern_data:
-            st.subheader("🔍 Common Interaction Mechanisms")
+            st.subheader("Common Interaction Mechanisms")
             
             keywords = pattern_data['mechanism_keywords']
             
@@ -281,9 +282,9 @@ class AnalyticsDashboard:
     def _display_categorical_analysis(self, analytics_data: Dict):
         """Display drug class and food category analysis"""
         
-        st.subheader("📋 Categorical Analysis")
+        st.subheader("Categorical Analysis")
         
-        tab1, tab2 = st.tabs(["💊 Drug Classes", "🥗 Food Categories"])
+        tab1, tab2 = st.tabs(["Drug Classes   |", "Food Categories    |"])
         
         with tab1:
             self._display_drug_class_analysis(analytics_data.get('drug_class_analysis', {}))
@@ -341,11 +342,11 @@ class AnalyticsDashboard:
         # Highest risk classes table
         highest_risk = drug_class_data.get('highest_risk_classes', [])
         if highest_risk:
-            st.subheader("⚠️ Highest Risk Drug Classes")
+            st.subheader("Highest Risk Drug Classes")
             
             risk_df = pd.DataFrame(highest_risk, columns=['Drug Class', 'Risk Score'])
             risk_df['Risk Level'] = risk_df['Risk Score'].apply(
-                lambda x: '🔴 High' if x > 2.5 else '🟡 Medium' if x > 1.5 else '🟢 Low'
+                lambda x: 'High' if x > 2.5 else 'Medium' if x > 1.5 else 'Low'
             )
             
             st.dataframe(risk_df, use_container_width=True)
@@ -418,7 +419,7 @@ class AnalyticsDashboard:
     def _display_risk_and_predictions(self, analytics_data: Dict):
         """Display risk assessment and prediction analytics"""
         
-        st.subheader("🎯 Risk Assessment & Predictions")
+        st.subheader("Risk Assessment & Predictions")
         
         col1, col2 = st.columns(2)
         
@@ -428,7 +429,7 @@ class AnalyticsDashboard:
             high_risk_combos = risk_data.get('high_risk_combinations', [])
             
             if high_risk_combos:
-                st.subheader("🔴 High-Risk Combinations")
+                st.subheader("High-Risk Combinations")
                 
                 # Create DataFrame for high-risk combinations
                 risk_df = pd.DataFrame(high_risk_combos)
@@ -478,7 +479,7 @@ class AnalyticsDashboard:
         # Temporal analysis
         temporal_data = analytics_data.get('temporal_analysis', {})
         if temporal_data and 'query_dates' in temporal_data:
-            st.subheader("📈 Query Patterns Over Time")
+            st.subheader("Query Patterns Over Time")
             
             dates = temporal_data['query_dates']
             counts = temporal_data['weekly_query_counts']
@@ -496,7 +497,7 @@ class AnalyticsDashboard:
     def _display_performance_metrics(self, analytics_data: Dict):
         """Display system performance and data quality metrics"""
         
-        st.subheader("⚡ Performance & Data Quality")
+        st.subheader("Performance & Data Quality")
         
         col1, col2, col3 = st.columns(3)
         
@@ -585,7 +586,7 @@ class AnalyticsDashboard:
             st.plotly_chart(fig_growth, use_container_width=True)
         
         # Performance summary table
-        st.subheader("📊 Performance Summary")
+        st.subheader("Performance Summary")
         
         perf_metrics = {
             'Metric': [
@@ -598,9 +599,9 @@ class AnalyticsDashboard:
                 f"{analytics_data.get('overview_stats', {}).get('interaction_coverage_rate', 0):.1f}%"
             ],
             'Status': [
-                '🟢 Optimal', '🟢 Fast', '🟡 Good', '🟢 Excellent',
-                '🟢 High' if quality_data.get('data_quality_score', 0) > 80 else '🟡 Medium',
-                '🟢 Good' if analytics_data.get('overview_stats', {}).get('interaction_coverage_rate', 0) > 75 else '🟡 Improving'
+                'Optimal', 'Fast', 'Good', 'Excellent',
+                'High' if quality_data.get('data_quality_score', 0) > 80 else 'Medium',
+                'Good' if analytics_data.get('overview_stats', {}).get('interaction_coverage_rate', 0) > 75 else 'Improving'
             ]
         }
         
@@ -674,12 +675,12 @@ class AnalyticsDashboard:
         """Add export options to analytics dashboard"""
         
         st.markdown("---")
-        st.subheader("📤 Export Analytics")
+        st.subheader("Export Analytics")
         
         col1, col2, col3 = st.columns(3)
         
         with col1:
-            if st.button("📊 Export Analytics PDF", type="secondary"):
+            if st.button("Export Analytics PDF", type="secondary"):
                 try:
                     with st.spinner("Generating analytics PDF..."):
                         pdf_bytes = self.generate_analytics_pdf(analytics_data)
@@ -687,44 +688,13 @@ class AnalyticsDashboard:
                         filename = f"analytics_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf"
                         
                         st.download_button(
-                            label="📥 Download Analytics PDF",
+                            label="Download Analytics PDF",
                             data=pdf_bytes,
                             file_name=filename,
                             mime="application/pdf"
                         )
                         
-                    st.success("✅ Analytics PDF ready for download!")
+                    st.success("Analytics PDF ready for download!")
                 except Exception as e:
-                    st.error(f"❌ Error generating analytics PDF: {e}")
+                    st.error(f"Error generating analytics PDF: {e}")
         
-        with col2:
-            if st.button("💾 Export Analytics JSON", type="secondary"):
-                analytics_json = json.dumps(analytics_data, indent=2, default=str)
-                filename = f"analytics_data_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
-                
-                st.download_button(
-                    label="📥 Download Analytics JSON",
-                    data=analytics_json,
-                    file_name=filename,
-                    mime="application/json"
-                )
-        
-        with col3:
-            if st.button("📈 Export Charts Data", type="secondary"):
-                # Extract chart data for export
-                chart_data = {}
-                
-                if 'severity_distribution' in analytics_data:
-                    chart_data['severity_distribution'] = analytics_data['severity_distribution']
-                if 'drug_class_analysis' in analytics_data:
-                    chart_data['drug_class_risk_scores'] = analytics_data['drug_class_analysis'].get('risk_scores', {})
-                
-                charts_json = json.dumps(chart_data, indent=2, default=str)
-                filename = f"chart_data_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
-                
-                st.download_button(
-                    label="📥 Download Chart Data",
-                    data=charts_json,
-                    file_name=filename,
-                    mime="application/json"
-                )

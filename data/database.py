@@ -475,3 +475,51 @@ class DatabaseManager:
             logging.error(f"Error caching results: {e}")
         finally:
             conn.close()
+
+
+    def ensure_fda_columns_exist(self):
+        """Ensure FDA-related columns exist in known_interactions table"""
+        
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        
+        try:
+            # Get existing columns
+            cursor.execute("PRAGMA table_info(known_interactions)")
+            existing_columns = [col[1] for col in cursor.fetchall()]
+            
+            # Required columns for FDA data
+            required_columns = {
+                'source': 'TEXT DEFAULT "manual"',
+                'date_added': 'TEXT DEFAULT ""',
+                'original_text': 'TEXT DEFAULT ""'
+            }
+            
+            # Add missing columns
+            added_columns = []
+            for col_name, col_def in required_columns.items():
+                if col_name not in existing_columns:
+                    cursor.execute(f"ALTER TABLE known_interactions ADD COLUMN {col_name} {col_def}")
+                    added_columns.append(col_name)
+                    logging.info(f"Added column: {col_name}")
+            
+            conn.commit()
+            
+            if added_columns:
+                logging.info(f"Successfully added FDA columns: {added_columns}")
+            else:
+                logging.info("All FDA columns already exist")
+                
+            return added_columns
+            
+        except Exception as e:
+            logging.error(f"Error ensuring FDA columns: {e}")
+            conn.rollback()
+            return []
+        finally:
+            conn.close()
+
+
+    def update_interactions_table_for_fda(self):
+        """Update known_interactions table to support FDA data"""
+        return self.ensure_fda_columns_exist()

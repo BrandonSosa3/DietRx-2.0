@@ -70,8 +70,8 @@ class SearchInterface:
             st.session_state.search_history[item_type] = history[:20]
     
     def render_medication_search(self) -> Optional[str]:
-        """Render medication search interface"""
-        st.subheader("🏥 Select Medications")
+        """Render single medication search interface"""
+        st.subheader("Select Medication (One at a time)")
         
         # Search box
         selected_med = st_searchbox(
@@ -82,26 +82,30 @@ class SearchInterface:
             clear_on_submit=True
         )
         
-        # Handle selection
-        if selected_med:
-            if selected_med not in st.session_state.selected_medications:
-                st.session_state.selected_medications.append(selected_med)
-                self.add_to_search_history(selected_med, 'medications')
-                st.rerun()
-            else:
-                st.warning(f"'{selected_med}' is already selected!")
+        # Handle selection - SINGLE ITEM ONLY (NO IMMEDIATE RERUN)
+        if selected_med and selected_med not in st.session_state.selected_medications:
+            # Replace any existing selection with the new one
+            st.session_state.selected_medications = [selected_med]
+            self.add_to_search_history(selected_med, 'medications')
+            # REMOVED st.rerun() - this was causing the loop!
         
-        # Display selected medications (NO REMOVE BUTTONS)
+        # Display selected medication
         if st.session_state.selected_medications:
-            st.write("**Selected Medications:**")
-            for med in st.session_state.selected_medications:
-                st.write(f"• **{med}**")
+            current_med = st.session_state.selected_medications[0]
+            
+            # Show selected medication in a nice box
+            st.success(f"**Selected Medication:** {current_med}")
+            
+            # Simple clear button
+            if st.button("Choose Different Medication", key="clear_med"):
+                st.session_state.selected_medications = []
+                st.rerun()  # Only rerun on explicit button click
         
         return selected_med
-    
+
     def render_food_search(self) -> Optional[str]:
-        """Render food search interface"""
-        st.subheader("🍎 Select Foods")
+        """Render single food search interface"""
+        st.subheader("Select Food (One at a time)")
         
         # Search box
         selected_food = st_searchbox(
@@ -112,20 +116,24 @@ class SearchInterface:
             clear_on_submit=True
         )
         
-        # Handle selection
-        if selected_food:
-            if selected_food not in st.session_state.selected_foods:
-                st.session_state.selected_foods.append(selected_food)
-                self.add_to_search_history(selected_food, 'foods')
-                st.rerun()
-            else:
-                st.warning(f"'{selected_food}' is already selected!")
+        # Handle selection - SINGLE ITEM ONLY (NO IMMEDIATE RERUN)
+        if selected_food and selected_food not in st.session_state.selected_foods:
+            # Replace any existing selection with the new one
+            st.session_state.selected_foods = [selected_food]
+            self.add_to_search_history(selected_food, 'foods')
+            # REMOVED st.rerun() - this was causing the loop!
         
-        # Display selected foods (NO REMOVE BUTTONS)
+        # Display selected food
         if st.session_state.selected_foods:
-            st.write("**Selected Foods:**")
-            for food in st.session_state.selected_foods:
-                st.write(f"• **{food}**")
+            current_food = st.session_state.selected_foods[0]
+            
+            # Show selected food in a nice box
+            st.success(f"**Selected Food:** {current_food}")
+            
+            # Simple clear button
+            if st.button("Choose Different Food", key="clear_food"):
+                st.session_state.selected_foods = []
+                st.rerun()  # Only rerun on explicit button click
         
         return selected_food
     
@@ -221,8 +229,23 @@ class SearchInterface:
         medications = st.session_state.selected_medications
         foods = st.session_state.selected_foods
         
-        from utils.error_handler import ErrorHandler
-        return ErrorHandler.validate_user_input(medications, foods)
+        if not medications:
+            return False, "Please select a medication."
+        
+        if not foods:
+            return False, "Please select a food."
+        
+        if len(medications) > 1:
+            return False, "Please select only one medication at a time."
+        
+        if len(foods) > 1:
+            return False, "Please select only one food at a time."
+        
+        return True, "Ready for analysis"
+
+    def has_selections(self) -> bool:
+        """Check if user has made valid selections"""
+        return bool(st.session_state.selected_medications or st.session_state.selected_foods)
 
     def display_selection_warnings(self):
         """Display warnings about current selections"""

@@ -1,0 +1,172 @@
+/* Professional Medical Application Styling */
+
+/* Main container styling */
+.stApp {
+    background-color: #ffffff;
+    font-family: 'Segoe UI', 'Roboto', sans-serif;
+}
+
+/* Headers and typography */
+h1, h2, h3 {
+    color: #1e3a8a;
+    font-weight: 500;
+    letter-spacing: -0.025em;
+}
+
+h1 {
+    font-size: 2rem;
+    border-bottom: 2px solid #e5e7eb;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+h2 {
+    font-size: 1.5rem;
+    color: #374151;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+}
+
+h3 {
+    font-size: 1.25rem;
+    color: #4b5563;
+    margin-bottom: 0.75rem;
+}
+
+/* Remove Streamlit branding */
+#MainMenu {visibility: hidden;}
+footer {visibility: hidden;}
+header {visibility: hidden;}
+
+/* Professional button styling */
+.stButton > button {
+    background-color: #1e40af;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 0.5rem 1.5rem;
+    font-weight: 500;
+    transition: background-color 0.2s;
+}
+
+.stButton > button:hover {
+    background-color: #1d4ed8;
+}
+
+/* Secondary button styling */
+.stButton > button[kind="secondary"] {
+    background-color: #f8fafc;
+    color: #475569;
+    border: 1px solid #cbd5e1;
+}
+
+.stButton > button[kind="secondary"]:hover {
+    background-color: #f1f5f9;
+}
+
+/* Professional info boxes */
+.stAlert {
+    border-radius: 8px;
+    border-left: 4px solid;
+    padding: 1rem;
+    margin: 1rem 0;
+}
+
+/* Success messages */
+.stAlert[data-baseweb="notification"][kind="success"] {
+    background-color: #f0fdf4;
+    border-left-color: #22c55e;
+    color: #166534;
+}
+
+/* Warning messages */
+.stAlert[data-baseweb="notification"][kind="warning"] {
+    background-color: #fffbeb;
+    border-left-color: #f59e0b;
+    color: #92400e;
+}
+
+/* Error messages */
+.stAlert[data-baseweb="notification"][kind="error"] {
+    background-color: #fef2f2;
+    border-left-color: #ef4444;
+    color: #dc2626;
+}
+
+/* Info messages */
+.stAlert[data-baseweb="notification"][kind="info"] {
+    background-color: #f0f9ff;
+    border-left-color: #3b82f6;
+    color: #1e40af;
+}
+
+/* Professional sidebar */
+.css-1d391kg {
+    background-color: #f8fafc;
+    border-right: 1px solid #e2e8f0;
+}
+
+/* Metric styling */
+.metric-container {
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 1rem;
+    margin: 0.5rem 0;
+}
+
+/* Table styling */
+.stDataFrame {
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+}
+
+/* Search box styling */
+.stSelectbox > div > div {
+    border-radius: 6px;
+    border-color: #d1d5db;
+}
+
+/* Professional spacing */
+.main-content {
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Status indicators without emojis */
+.status-indicator {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 8px;
+}
+
+.status-operational {
+    background-color: #22c55e;
+}
+
+.status-warning {
+    background-color: #f59e0b;
+}
+
+.status-error {
+    background-color: #ef4444;
+}
+
+/* Professional card styling */
+.info-card {
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin: 1rem 0;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+/* Section dividers */
+.section-divider {
+    border-top: 1px solid #e2e8f0;
+    margin: 2rem 0;
+}

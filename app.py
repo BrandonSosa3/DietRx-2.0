@@ -3,7 +3,7 @@ import streamlit as st
 # Configure Streamlit page FIRST
 st.set_page_config(
     page_title="DietRx Enhanced",
-    page_icon="💊",
+    page_icon="",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -15,6 +15,7 @@ from typing import List, Dict, Optional, Tuple
 import time
 import os
 import time
+from datetime import datetime, timedelta
 import plotly.express as px
 import pandas as pd
 import numpy as np
@@ -37,6 +38,7 @@ from components.results_display import ResultsDisplay
 from utils.error_handler import ErrorHandler
 from utils.analytics_engine import AnalyticsEngine
 from components.analytics_dashboard import AnalyticsDashboard
+from components.professional_ui import ProfessionalUI
 
 # Direct import of SearchInterface
 try:
@@ -55,6 +57,7 @@ logging.basicConfig(
 
 class DietRxApp:
     def __init__(self):
+        self.ui = ProfessionalUI
         self.initialize_session_state()
     
     def initialize_session_state(self):
@@ -121,231 +124,267 @@ class DietRxApp:
         return st.session_state.components
         
     def populate_initial_data(self):
-        """Populate database with initial data if needed"""
-        if not st.session_state.db_populated:
-            components = self.setup_components()
-            if not components:
-                return
+        """Populate database with initial data"""
+        try:
+            components = st.session_state.components
+            db_manager = components['db_manager']
             
-            data_processor = components['data_processor']
-            
-            # Check if database is already populated
-            if data_processor.is_database_populated():
-                logging.info("Database already populated, skipping initialization")
+            with st.spinner("Initializing database..."):
+                
+                # Update database schema for FDA support
+                db_manager.update_interactions_table_for_fda()
+                
+                # Use your existing initialization
+                medications = db_manager.get_all_medications()
+                foods = db_manager.get_all_foods()
+                
+                st.session_state.medication_names = [med['name'] for med in medications]
+                st.session_state.food_names = [food['name'] for food in foods]
                 st.session_state.db_populated = True
                 
-                # Just refresh the cached names
-                st.session_state.medication_names = data_processor.get_medication_names()
-                st.session_state.food_names = data_processor.get_food_names()
+                st.success(f"""
+                Database initialized successfully!
+                """)
                 
-                # Show current stats
-                stats = data_processor.get_database_stats()
-                st.success(f"✅ Database ready! {stats['searchable_med_names']} medications, {stats['searchable_food_names']} foods, {stats['total_interactions']} interactions available.")
-                return
-            
-            # Only populate if needed
-            with st.spinner("Setting up comprehensive database for first use..."):
-                try:
-                    # Show progress
-                    progress_bar = st.progress(0)
-                    status_text = st.empty()
-                    
-                    # Populate core medications (fallback data)
-                    status_text.text("Loading core medications...")
-                    progress_bar.progress(10)
-                    med_count = data_processor.populate_common_medications()
-                    
-                    # Clean up complex names
-                    status_text.text("Cleaning up complex names...")
-                    progress_bar.progress(20)
-                    data_processor.cleanup_complex_medication_names()
-                    
-                    # Populate core foods (fallback data)
-                    status_text.text("Loading core foods...")
-                    progress_bar.progress(30)
-                    food_count = data_processor.populate_common_foods()
-                    
-                    # Populate interactions
-                    status_text.text("Loading interaction database...")
-                    progress_bar.progress(40)
-                    interaction_count = data_processor.populate_interaction_database()
-                    
-                    # NEW: Expand database with comprehensive data
-                    status_text.text("Expanding database with comprehensive medication data...")
-                    progress_bar.progress(60)
-                    expansion_results = data_processor.expand_database(med_target=300, food_target=150)
-                    
-                    status_text.text("Finalizing comprehensive database...")
-                    progress_bar.progress(90)
-                    
-                    # Cache the names for autocomplete
-                    st.session_state.medication_names = data_processor.get_medication_names()
-                    st.session_state.food_names = data_processor.get_food_names()
-                    
-                    # Final setup
-                    status_text.text("Database ready!")
-                    progress_bar.progress(100)
-                    
-                    st.session_state.db_populated = True
-                    
-                    # Clear progress indicators
-                    progress_bar.empty()
-                    status_text.empty()
-                    
-                    # Show final comprehensive stats
-                    final_stats = data_processor.get_database_stats()
-                    st.success(f"✅ Comprehensive database initialized! {final_stats['searchable_med_names']} medications, {final_stats['searchable_food_names']} foods, and {interaction_count} interactions loaded!")
-                    
-                    # Show expansion summary
-                    st.info(f"📈 Database expanded: {expansion_results['medications']} total medications, {expansion_results['foods']} total foods available for analysis.")
-                    
-                except Exception as e:
-                    st.error(f"❌ Error initializing database: {e}")
-                    logging.error(f"Database initialization error: {e}")
+        except Exception as e:
+            st.error(f"Error during database initialization: {e}")
+            logging.error(f"Database initialization error: {e}")
     
     def render_sidebar(self, components):
         """Render application sidebar"""
         with st.sidebar:
-            st.header("📋 App Status")
+            st.header("App Status")
             
-            # Navigation - UPDATED with new pages
-            st.subheader("🧭 Navigation")
+            # Navigation - Keep this
+            st.subheader("Navigation")
             page = st.radio(
                 "Choose page:",
                 [
-                    "🔍 Search & Analyze", 
-                    "📊 Analytics Dashboard",  # NEW
-                    "🧪 Test Fuzzy Matching", 
-                    "📋 Database Stats",
-                    "⚡ Performance Monitor"   # NEW
+                    "Search & Analyze", 
+                    "Analytics Dashboard",
+                    "Test Fuzzy Matching", 
+                    "Performance Monitor"
                 ],
                 key="page_selector"
             )
             
             # Update current page
-            if page == "🔍 Search & Analyze":
+            if page == "Search & Analyze":
                 st.session_state.current_page = 'search'
-            elif page == "📊 Analytics Dashboard":
-                st.session_state.current_page = 'analytics'  # NEW
-            elif page == "🧪 Test Fuzzy Matching":
+            elif page == "Analytics Dashboard":
+                st.session_state.current_page = 'analytics'
+            elif page == "Test Fuzzy Matching":
                 st.session_state.current_page = 'test'
-            elif page == "📋 Database Stats":
-                st.session_state.current_page = 'stats'
-            elif page == "⚡ Performance Monitor":
-                st.session_state.current_page = 'performance'  # NEW
+            elif page == "Performance Monitor":
+                st.session_state.current_page = 'performance'
             
             st.markdown("---")
             
-            # Enhanced statistics display
+            # Enhanced statistics display - Keep this
             self._display_enhanced_sidebar_stats(components)
             
             st.markdown("---")
             
-            # Control buttons (keep existing ones)
-            if st.button("🔄 Refresh Cache"):
+            # ONLY KEEP ESSENTIAL ONGOING BUTTONS
+            
+            # Cache management - Keep this as it's useful ongoing
+            if st.button("Refresh Cache"):
                 try:
                     components['cache_manager'].clear_memory_cache()
                     st.success("Cache refreshed!")
                 except Exception as e:
                     st.error(f"Error refreshing cache: {e}")
             
-            if st.button("🧹 Clean Reset Database", help="Remove all data and start fresh"):
-                try:
-                    import os
-                    if os.path.exists(DATABASE_PATH):
-                        os.remove(DATABASE_PATH)
-                        st.success("✅ Database deleted!")
-                    
-                    # Clear session state
-                    st.session_state.db_populated = False
-                    st.session_state.medication_names = []
-                    st.session_state.food_names = []
-                    if 'components' in st.session_state:
-                        del st.session_state.components
-                    
-                    st.info("🔄 Please refresh the page to reinitialize with clean data.")
-                    
-                except Exception as e:
-                    st.error(f"❌ Error resetting database: {e}")
+            # Database viewer - Keep this as it's useful for checking data
+            if st.button("View Database", help="View current interactions in database"):
+                st.session_state.show_database_viewer = not st.session_state.get('show_database_viewer', False)
             
-            if st.button("🗑️ Reset App"):
-                # Clear session state
-                for key in list(st.session_state.keys()):
-                    del st.session_state[key]
-                st.rerun()
+            # Show database viewer if toggled
+            if st.session_state.get('show_database_viewer', False):
+                self._display_database_viewer(components)
+            
+            st.markdown("---")
+            
+            # Admin section - Only show if needed
+            if st.session_state.get('show_admin_tools', False):
+                st.subheader("Admin Tools")
+                
+                if st.button("Fetch More FDA Data", help="Get additional FDA interactions"):
+                    self._fetch_more_fda_data(components)
+                
+                if st.button("Clean Reset Database", help="Remove all data and start fresh"):
+                    self._reset_database(components)
+                    
+                if st.button("Reset App"):
+                    # Clear session state
+                    for key in list(st.session_state.keys()):
+                        del st.session_state[key]
+                    st.rerun()
+            else:
+                # Simple toggle to show admin tools when needed
+                if st.button("Show Admin Tools", type="secondary"):
+                    st.session_state.show_admin_tools = True
+                    st.rerun()
+
+
+        
     
     def render_search_page(self, components):
         """Render the main search and analyze page"""
-        st.title("🍎💊 DietRx Enhanced")
-        st.markdown("**Advanced Food-Drug Interaction Checker**")
+        
+        # Professional header without emojis
+        st.title("Drug-Food Interaction Analysis")
         st.markdown("---")
         
         search_interface = components['search_interface']
         
-        # Medication search (full width)
+        # Medication search section
+        st.markdown("""
+        <div style="background-color: #bac4cf; border: 1px solid #e2e8f0; border-radius: 8px; padding: 1.5rem; margin: 1rem 0;">
+            <h3 style="color: #374151; margin: 0 0 1rem 0;">Medication Selection</h3>
+        </div>
+        """, unsafe_allow_html=True)
+        
         search_interface.render_medication_search()
         
-        st.markdown("---")
+        # Section divider
+        st.markdown('<div style="border-top: 1px solid #e2e8f0; margin: 2rem 0;"></div>', unsafe_allow_html=True)
         
-        # Food search (full width)  
+        # Food search section
+        st.markdown("""
+        <div style="background-color: #bac4cf; border: 1px solid #e2e8f0; border-radius: 8px; padding: 1.5rem; margin: 1rem 0;">
+            <h3 style="color: #374151; margin: 0 0 1rem 0;">Food Selection</h3>
+        </div>
+        """, unsafe_allow_html=True)
+        
         search_interface.render_food_search()
         
         # Analysis section
-        st.markdown("---")
+        st.markdown('<div style="border-top: 1px solid #e2e8f0; margin: 2rem 0;"></div>', unsafe_allow_html=True)
         
         if search_interface.has_selections():
             medications, foods = search_interface.get_selected_items()
             
-            st.subheader("🔍 Ready for Analysis")
-            st.write(f"**Selected:** {len(medications)} medications, {len(foods)} foods")
+            # Professional analysis header
+            st.markdown("""
+            <h2 style="color: #374151; font-size: 1.5rem; margin-bottom: 1rem;">
+                Analysis Configuration
+            </h2>
+            """, unsafe_allow_html=True)
             
-            # Add a simple "Start Over" button as the only clear option
-            if st.button("🔄 Start Over (Clear All)", type="secondary", key="start_over"):
-                st.session_state.selected_medications = []
-                st.session_state.selected_foods = []
-                st.success("✅ Cleared all selections")
-                st.rerun()
+            # Show what will be analyzed in professional format
+            if medications and foods:
+                st.markdown("""
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0;">
+                    <div style="background-color: #f0f9ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 1rem;">
+                        <h4 style="color: #1e40af; margin: 0 0 0.5rem 0; font-size: 0.9rem; text-transform: uppercase;">Medication</h4>
+                        <p style="color: #1e40af; font-weight: 500; margin: 0; font-size: 1.1rem;">{}</p>
+                    </div>
+                    <div style="background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 1rem;">
+                        <h4 style="color: #166534; margin: 0 0 0.5rem 0; font-size: 0.9rem; text-transform: uppercase;">Food Item</h4>
+                        <p style="color: #166534; font-weight: 500; margin: 0; font-size: 1.1rem;">{}</p>
+                    </div>
+                </div>
+                """.format(medications[0], foods[0]), unsafe_allow_html=True)
+                
+                st.markdown("""
+                <p style="color: #4b5563; margin: 1rem 0;">
+                    This analysis will evaluate potential interactions between the selected medication and food item 
+                    based on current clinical evidence and pharmacological data.
+                </p>
+                """, unsafe_allow_html=True)
+                
+            elif medications:
+                st.markdown("""
+                <div style="background-color: #fffbeb; border: 1px solid #fbbf24; border-radius: 8px; padding: 1rem; margin: 1rem 0;">
+                    <h4 style="color: #92400e; margin: 0 0 0.5rem 0;">Incomplete Selection</h4>
+                    <p style="color: #92400e; margin: 0;">Please select a food item to analyze with your medication.</p>
+                </div>
+                """, unsafe_allow_html=True)
+                
+            elif foods:
+                st.markdown("""
+                <div style="background-color: #fffbeb; border: 1px solid #fbbf24; border-radius: 8px; padding: 1rem; margin: 1rem 0;">
+                    <h4 style="color: #92400e; margin: 0 0 0.5rem 0;">Incomplete Selection</h4>
+                    <p style="color: #92400e; margin: 0;">Please select a medication to analyze with your food item.</p>
+                </div>
+                """, unsafe_allow_html=True)
             
-            # Big analyze button
-            if st.button("🚀 Analyze Interactions", type="primary", key="analyze_button"):
-                self.perform_interaction_analysis(components, medications, foods)
+            # Professional button styling - only show if both are selected
+            if medications and foods:
+                col1, col2 = st.columns([1, 1])
+                
+                with col1:
+                    # Custom styled analyze button
+                    analyze_clicked = st.button(
+                        "Run Interaction Analysis",
+                        type="primary",
+                        key="analyze_button",
+                        help="Analyze the selected medication and food for potential interactions"
+                    )
+                    if analyze_clicked:
+                        self.perform_interaction_analysis(components, medications, foods)
+                
+                with col2:
+                    # Custom styled clear button
+                    clear_clicked = st.button(
+                        "Reset Selections",
+                        type="secondary", 
+                        key="start_over",
+                        help="Clear current selections and start over"
+                    )
+                    if clear_clicked:
+                        st.session_state.selected_medications = []
+                        st.session_state.selected_foods = []
+                        st.success("Selections cleared successfully")
+                        st.rerun()
         
-        # Show previous results if they exist (keep this part)
+        else:
+            # Professional instruction message
+            st.markdown("""
+            <div style="background-color: #f0f9ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 1.5rem; margin: 2rem 0; text-align: center;">
+                <h3 style="color: #1e40af; margin: 0 0 0.5rem 0;">Get Started</h3>
+                <p style="color: #1e40af; margin: 0;">
+                    Select one medication and one food item above to begin the interaction analysis.
+                </p>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        # Show previous results if they exist
         if 'analysis_results' in st.session_state:
-            st.markdown("---")
-            st.subheader("📊 Latest Analysis Results")
+            st.markdown('<div style="border-top: 2px solid #e2e8f0; margin: 2rem 0;"></div>', unsafe_allow_html=True)
             
-            # Show what was analyzed
+            # Professional results header
+            st.markdown("""
+            <h2 style="color: white; font-size: 1.5rem; margin-bottom: 1rem;">
+                Analysis Results
+            </h2>
+            """, unsafe_allow_html=True)
+            
+            # Show what was analyzed professionally
             meds_analyzed = st.session_state.get('analysis_medications', [])
             foods_analyzed = st.session_state.get('analysis_foods', [])
             
-            col1, col2 = st.columns(2)
-            with col1:
-                if meds_analyzed:
-                    st.write("**Medications analyzed:**")
-                    for med in meds_analyzed:
-                        st.write(f"• {med}")
-            
-            with col2:
-                if foods_analyzed:
-                    st.write("**Foods analyzed:**")
-                    for food in foods_analyzed:
-                        st.write(f"• {food}")
+            if meds_analyzed and foods_analyzed:
+                st.markdown("""
+                <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 1rem; margin: 1rem 0;">
+                    <p style="color: #4b5563; margin: 0;">
+                        <strong>Analysis Subject:</strong> {} + {}
+                    </p>
+                </div>
+                """.format(meds_analyzed[0], foods_analyzed[0]), unsafe_allow_html=True)
             
             # Display the stored results
             self.display_analysis_results(st.session_state.analysis_results)
             
-            # Clear results button
-            if st.button("🗑️ Clear Results", type="secondary", key="clear_results_unique"):
+            # Professional clear results button
+            if st.button("Clear Analysis Results", type="secondary", key="clear_results", help="Remove current analysis results"):
                 del st.session_state.analysis_results
                 if 'analysis_medications' in st.session_state:
                     del st.session_state.analysis_medications
                 if 'analysis_foods' in st.session_state:
                     del st.session_state.analysis_foods
                 st.rerun()
-        
-        elif not search_interface.has_selections():
-            st.info("👆 **Start by selecting medications and foods above to check for interactions.**")
 
 
     def display_analysis_results(self, results: AnalysisResults):
@@ -374,7 +413,7 @@ class DietRxApp:
     
     def render_test_page(self, components):
         """Render the fuzzy matching test page"""
-        st.title("🧪 Test Fuzzy Matching")
+        st.title("Test Fuzzy Matching")
         st.markdown("---")
         
         st.markdown("Try entering medication or food names with typos to test the matching system:")
@@ -438,7 +477,7 @@ class DietRxApp:
     
     def render_stats_page(self, components):
         """Render database statistics page"""
-        st.title("📊 Database Statistics")
+        st.title("Database Statistics")
         st.markdown("---")
         
         try:
@@ -475,11 +514,11 @@ class DietRxApp:
                                 st.write(f"**Brands:** {', '.join(brands)}")
             
             with col2:
-                st.subheader("🥗 Sample Foods")
+                st.subheader("Sample Foods")
                 if foods:
                     sample_foods = foods[:10]
                     for food in sample_foods:
-                        with st.expander(f"🍎 {food['name']}"):
+                        with st.expander(f"{food['name']}"):
                             st.write(f"**Category:** {food.get('category', 'N/A')}")
                             if food.get('aliases'):
                                 aliases = eval(food['aliases']) if isinstance(food['aliases'], str) else food['aliases']
@@ -493,10 +532,10 @@ class DietRxApp:
         duration = time.time() - start_time
         
         if duration > 5.0:  # Slow operation
-            st.warning(f"⚠️ {operation_name} took {duration:.1f} seconds (slower than expected)")
+            st.warning(f"{operation_name} took {duration:.1f} seconds (slower than expected)")
             logging.warning(f"Slow operation: {operation_name} - {duration:.2f}s")
         elif duration > 2.0:
-            st.info(f"ℹ️ {operation_name} completed in {duration:.1f} seconds")
+            st.info(f"{operation_name} completed in {duration:.1f} seconds")
         
         logging.info(f"Performance: {operation_name} - {duration:.2f}s")
 
@@ -508,7 +547,7 @@ class DietRxApp:
         is_valid, validation_msg = search_interface.validate_selections()
         
         if not is_valid:
-            st.error(f"❌ {validation_msg}")
+            st.error(f"{validation_msg}")
             return
         
         # Show selection warnings
@@ -519,7 +558,7 @@ class DietRxApp:
         try:
             start_time = time.time()
             
-            with st.spinner("🔍 Analyzing interactions..."):
+            with st.spinner("Analyzing interactions..."):
                 # Perform the analysis
                 results = ErrorHandler.safe_execute(
                     lambda: interaction_engine.analyze_interactions(medications, foods),
@@ -528,7 +567,7 @@ class DietRxApp:
                 )
                 
                 if results is None:
-                    st.error("❌ Analysis failed. Please try again or contact support.")
+                    st.error("Analysis failed. Please try again or contact support.")
                     return
                 
                 # Monitor performance
@@ -543,18 +582,18 @@ class DietRxApp:
                 # self.display_analysis_results(results)  # <-- REMOVE THIS
                 
                 # Just show success message and let render_search_page handle display
-                st.success("✅ Analysis completed! Results displayed below.")
+                st.success("Analysis completed! Results displayed below.")
                 st.rerun()  # Refresh to show the results
                 
                 # Log successful analysis
                 logging.info(f"Successful analysis: {len(medications)} meds, {len(foods)} foods, {len(results.interactions)} interactions")
                 
         except Exception as e:
-            st.error(f"❌ Critical error during analysis: {str(e)}")
+            st.error(f"Critical error during analysis: {str(e)}")
             logging.error(f"Critical analysis error: {e}")
             
             # Offer fallback options
-            st.info("💡 You can try:")
+            st.info("You can try:")
             st.write("• Reducing the number of selected items")
             st.write("• Refreshing the page and trying again")
             st.write("• Contacting support if the problem persists")
@@ -562,7 +601,7 @@ class DietRxApp:
 
     def render_database_viewer_page(self, components):
         """Render database viewer page"""
-        st.title("🗄️ Database Viewer")
+        st.title("Database Viewer")
         st.markdown("**Explore the underlying data powering DietRx**")
         st.markdown("---")
         
@@ -570,7 +609,7 @@ class DietRxApp:
         self._show_database_overview(components)
         
         # Table viewers
-        tab1, tab2, tab3, tab4 = st.tabs(["💊 Medications", "🍎 Foods", "⚡ Interactions", "📊 API Cache"])
+        tab1, tab2, tab3, tab4 = st.tabs(["Medications", "Foods", "⚡ Interactions", "API Cache"])
         
         with tab1:
             self._show_medications_table(components)
@@ -615,18 +654,18 @@ class DietRxApp:
             col1, col2, col3, col4, col5 = st.columns(5)
             
             with col1:
-                st.metric("💊 Medications", table_stats.get('medications', 0))
+                st.metric("Medications", table_stats.get('medications', 0))
             with col2:
-                st.metric("🍎 Foods", table_stats.get('foods', 0))
+                st.metric("Foods", table_stats.get('foods', 0))
             with col3:
-                st.metric("⚡ Interactions", table_stats.get('known_interactions', 0))
+                st.metric("Interactions", table_stats.get('known_interactions', 0))
             with col4:
-                st.metric("📊 Cache Entries", table_stats.get('api_cache', 0))
+                st.metric("Cache Entries", table_stats.get('api_cache', 0))
             with col5:
-                st.metric("💾 DB Size", f"{db_size_mb:.1f} MB")
+                st.metric("DB Size", f"{db_size_mb:.1f} MB")
             
             # Database location
-            st.info(f"📍 **Database Location:** `{DATABASE_PATH}`")
+            st.info(f"**Database Location:** `{DATABASE_PATH}`")
             
         except Exception as e:
             st.error(f"Error accessing database: {e}")
@@ -669,7 +708,7 @@ class DietRxApp:
             # Download option
             csv = df.to_csv(index=False)
             st.download_button(
-                label="📥 Download as CSV",
+                label="Download as CSV",
                 data=csv,
                 file_name="medications.csv",
                 mime="text/csv"
@@ -719,7 +758,7 @@ class DietRxApp:
             # Download option
             csv = df.to_csv(index=False)
             st.download_button(
-                label="📥 Download as CSV",
+                label="Download as CSV",
                 data=csv,
                 file_name="foods.csv",
                 mime="text/csv"
@@ -765,7 +804,7 @@ class DietRxApp:
             with col1:
                 severity_filter = st.selectbox("Filter by severity:", ['All', 'avoid', 'caution', 'safe'])
             with col2:
-                search_term = st.text_input("🔍 Search interactions:", key="interaction_search")
+                search_term = st.text_input("Search interactions:", key="interaction_search")
             
             if severity_filter != 'All':
                 df = df[df['Severity'] == severity_filter]
@@ -780,7 +819,7 @@ class DietRxApp:
             # Download option
             csv = df.to_csv(index=False)
             st.download_button(
-                label="📥 Download as CSV",
+                label="Download as CSV",
                 data=csv,
                 file_name="interactions.csv",
                 mime="text/csv"
@@ -829,54 +868,48 @@ class DietRxApp:
             stats = components['data_processor'].get_database_stats()
             cache_stats = components['cache_manager'].get_cache_stats()
             
-            st.write("**📊 Data Overview:**")
+            st.write("**Data Overview:**")
             col1, col2 = st.columns(2)
             
             with col1:
-                st.metric("💊 Meds", f"{stats.get('searchable_med_names', 0)}")
-                st.metric("🥗 Foods", f"{stats.get('searchable_food_names', 0)}")
+                st.metric("Meds", f"{stats.get('searchable_med_names', 0)}")
+                st.metric("Foods", f"{stats.get('searchable_food_names', 0)}")
             
             with col2:
-                st.metric("⚡ Interactions", f"{stats.get('total_interactions', 0)}")
-                st.metric("🗂️ Classes", f"{stats.get('drug_classes_count', 'N/A')}")
-            
-            st.write("**⚡ Performance:**")
-            st.progress(min(cache_stats['database_cache_active'] / 100, 1.0))
-            st.caption(f"Cache: {cache_stats['database_cache_active']} entries")
+                st.metric("Interactions", f"{stats.get('total_interactions', 0)}")
+                
+                # Show FDA count if available
+                try:
+                    conn = components['db_manager'].get_connection()
+                    cursor = conn.cursor()
+                    cursor.execute("SELECT COUNT(*) FROM known_interactions WHERE source LIKE 'FDA%'")
+                    fda_count = cursor.fetchone()[0]
+                    conn.close()
+                    st.metric("FDA Data", fda_count)
+                except:
+                    st.metric("Classes", f"{stats.get('drug_classes_count', 'N/A')}")
             
             # User selections
             if hasattr(st.session_state, 'selected_medications') and st.session_state.selected_medications:
                 st.metric("Selected Items", 
                         len(st.session_state.selected_medications) + len(st.session_state.get('selected_foods', [])))
             
-            # Quick analytics preview
-            if st.session_state.current_page != 'analytics':
-                if st.button("📊 View Analytics", type="secondary"):
-                    st.session_state.current_page = 'analytics'
-                    st.rerun()
-            
         except Exception as e:
-            # Fallback to basic stats
-            try:
-                medications = components['db_manager'].get_all_medications()
-                foods = components['db_manager'].get_all_foods()
-                st.write(f"**Database:** {len(medications)} meds, {len(foods)} foods")
-            except:
-                st.error("Error loading stats")
+            st.error("Error loading stats")
 
     def render_analytics_page(self, components):
         """Render the analytics dashboard page"""
-        st.title("📊 Advanced Analytics Dashboard")
+        st.title("Advanced Analytics Dashboard")
         st.markdown("**Comprehensive Drug-Food Interaction Intelligence**")
         
         # Check if data is available
         try:
             stats = components['data_processor'].get_database_stats()
             if stats.get('total_interactions', 0) == 0:
-                st.warning("⚠️ No interaction data available. Please ensure the database is populated.")
+                st.warning("No interaction data available. Please ensure the database is populated.")
                 return
         except Exception as e:
-            st.error(f"❌ Error checking data availability: {e}")
+            st.error(f"Error checking data availability: {e}")
             return
         
         # Analytics generation with caching
@@ -887,7 +920,7 @@ class DietRxApp:
             analytics_dashboard = components['analytics_dashboard']
             analytics_dashboard.display_comprehensive_dashboard(analytics_data)
         else:
-            st.error("❌ Could not generate analytics data")
+            st.error("Could not generate analytics data")
 
     def _get_cached_analytics(self, components):
         """Get analytics data with caching for performance"""
@@ -906,12 +939,11 @@ class DietRxApp:
             cache_timestamp_key in st.session_state and
             current_time - st.session_state[cache_timestamp_key] < cache_duration):
             
-            st.info("📊 Using cached analytics data for better performance")
             return st.session_state[cache_key]
         
         # Generate fresh analytics
         try:
-            with st.spinner("🔄 Generating comprehensive analytics..."):
+            with st.spinner("Generating comprehensive analytics..."):
                 analytics_engine = components['analytics_engine']
                 
                 # Add progress tracking
@@ -940,18 +972,18 @@ class DietRxApp:
                 progress_bar.empty()
                 status_text.empty()
                 
-                st.success("✅ Analytics generated successfully!")
+                st.success("Analytics generated successfully!")
                 
                 return analytics_data
                 
         except Exception as e:
-            st.error(f"❌ Error generating analytics: {e}")
+            st.error(f"Error generating analytics: {e}")
             logging.error(f"Analytics generation error: {e}")
             return None
 
     def render_performance_page(self, components):
         """Render the performance monitoring page"""
-        st.title("⚡ Performance Monitor")
+        st.title("Performance Monitor")
         st.markdown("**System Performance & Optimization Insights**")
         
         # Real-time performance metrics
@@ -959,7 +991,7 @@ class DietRxApp:
         
         with col1:
             # Database performance
-            st.subheader("🗄️ Database Performance")
+            st.subheader("Database Performance")
             
             try:
                 # Simulate database query timing
@@ -980,7 +1012,7 @@ class DietRxApp:
         
         with col2:
             # Cache performance
-            st.subheader("💾 Cache Performance")
+            st.subheader("Cache Performance")
             
             try:
                 cache_stats = components['cache_manager'].get_cache_stats()
@@ -997,7 +1029,7 @@ class DietRxApp:
         
         with col3:
             # System health
-            st.subheader("🏥 System Health")
+            st.subheader("System Health")
             
             # Component health checks
             health_checks = self._run_health_checks(components)
@@ -1014,7 +1046,7 @@ class DietRxApp:
         
         # Detailed performance analysis
         st.markdown("---")
-        st.subheader("📈 Detailed Performance Analysis")
+        st.subheader("Detailed Performance Analysis")
         
         # Performance over time (simulated)
         dates = pd.date_range(start='2024-01-01', periods=30, freq='D')
@@ -1035,13 +1067,13 @@ class DietRxApp:
         st.plotly_chart(fig_performance, use_container_width=True)
         
         # Component status table
-        st.subheader("🔧 Component Status")
+        st.subheader("Component Status")
         
         status_data = []
         for component, status in health_checks.items():
             status_data.append({
                 'Component': component,
-                'Status': '✅ Operational' if status else '❌ Issues',
+                'Status': 'Operational' if status else 'Issues',
                 'Response Time': f"{np.random.uniform(5, 25):.1f}ms",
                 'Last Check': datetime.now().strftime('%H:%M:%S')
             })
@@ -1089,13 +1121,127 @@ class DietRxApp:
             health_status['Cache Manager'] = False
         
         return health_status
+
+    def _display_database_viewer(self, components):
+        """Display database viewer in sidebar"""
+        try:
+            conn = components['db_manager'].get_connection()
+            cursor = conn.cursor()
+            
+            cursor.execute("SELECT COUNT(*) FROM known_interactions WHERE source LIKE 'FDA%'")
+            fda_count = cursor.fetchone()[0]
+            cursor.execute("SELECT COUNT(*) FROM known_interactions")
+            total_count = cursor.fetchone()[0]
+            
+            st.write(f"**Database Status:**")
+            st.write(f"• Total: {total_count} interactions")  
+            st.write(f"• FDA Official: {fda_count}")
+            st.write(f"• Manual/Other: {total_count - fda_count}")
+            
+            
+            conn.close()
+            
+        except Exception as e:
+            st.error(f"Database viewer error: {e}")
+
+    def _fetch_more_fda_data(self, components):
+        """Fetch more FDA data - only when needed"""
+        try:
+            with st.spinner("Fetching FDA data..."):
+                from data.fda_interaction_fetcher import FDAInteractionFetcher
+                fda_fetcher = FDAInteractionFetcher(components['db_manager'])
+                
+                results = fda_fetcher.fetch_and_store_all(limit=50)
+                
+                if results['stored'] > 0:
+                    st.success(f"Added {results['stored']} new FDA interactions!")
+                else:
+                    st.info("No new interactions found (may already exist)")
+                    
+        except Exception as e:
+            st.error(f"FDA fetch error: {e}")
+
+    def _reset_database(self, components):
+        """Reset database - only when needed"""
+        try:
+            import os
+            if os.path.exists("data/interactions.db"):  # Your DB path
+                os.remove("data/interactions.db")
+                st.success("Database deleted!")
+            
+            # Clear session state
+            st.session_state.db_populated = False
+            st.session_state.medication_names = []
+            st.session_state.food_names = []
+            if 'components' in st.session_state:
+                del st.session_state.components
+            
+            st.info("Please refresh the page to reinitialize")
+            
+        except Exception as e:
+            st.error(f"Error resetting database: {e}")
     
     def run(self):
         """Main application entry point"""
+        st.markdown("""
+        <style>
+        /* Existing CSS... */
+
+        /* Fix search box styling */
+        .stSelectbox > div > div {
+            border: 1px solid #d1d5db !important;
+            border-radius: 6px !important;
+            background-color: white !important;
+        }
+
+        /* Fix searchbox component styling */
+        div[data-testid="stSelectbox"] > div {
+            border: 1px solid #d1d5db !important;
+            border-radius: 6px !important;
+            box-shadow: none !important;
+        }
+
+        /* Override streamlit-searchbox styling */
+        .streamlit-searchbox {
+            border: 1px solid #d1d5db !important;
+            border-radius: 6px !important;
+            background-color: white !important;
+        }
+
+        /* Remove any black borders/outlines */
+        input, select, textarea {
+            border: 1px solid #d1d5db !important;
+            border-radius: 6px !important;
+            outline: none !important;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: #3b82f6 !important;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+            outline: none !important;
+        }
+
+        /* Fix any weird black squares */
+        div[data-baseweb="select"] {
+            border: 1px solid #d1d5db !important;
+            background-color: white !important;
+        }
+
+        div[data-baseweb="select"]:hover {
+            border-color: #9ca3af !important;
+        }
+
+        div[data-baseweb="select"]:focus-within {
+            border-color: #3b82f6 !important;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+        }
+        </style>
+        """, unsafe_allow_html=True)
+
         # Initialize components
         components = self.setup_components()
         if not components:
-            st.error("❌ Failed to initialize application. Please refresh the page.")
+            st.error("Failed to initialize application. Please refresh the page.")
             st.stop()
         
         # Populate initial data if needed
@@ -1130,7 +1276,7 @@ def main():
         app = DietRxApp()
         app.run()
     except Exception as e:
-        st.error(f"❌ Application error: {e}")
+        st.error(f"Application error: {e}")
         logging.error(f"Application error: {e}")
 
 if __name__ == "__main__":

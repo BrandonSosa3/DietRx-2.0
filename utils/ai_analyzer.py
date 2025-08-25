@@ -263,8 +263,8 @@ class AIAnalyzer:
         advice = []
         
         if not interactions:
-            advice.append("✅ Great news! No significant interactions were found.")
-            advice.append("💡 Continue monitoring your medications and diet, and always consult your healthcare provider about any concerns.")
+            advice.append("Great news! No significant interactions were found.")
+            advice.append("Continue monitoring your medications and diet, and always consult your healthcare provider about any concerns.")
             return advice
         
         # Categorize advice by severity
@@ -272,19 +272,19 @@ class AIAnalyzer:
         caution_interactions = [i for i in interactions if i.get('severity') == 'caution']
         
         if critical_interactions:
-            advice.append("🚨 **Critical Actions Required:**")
+            advice.append("**Critical Actions Required:**")
             for interaction in critical_interactions[:2]:  # Top 2 most critical
                 advice.append(f"   • Immediately discuss {interaction.get('medication_name')} + {interaction.get('food_name')} with your doctor")
         
         if caution_interactions:
-            advice.append("⚠️ **Monitoring Recommendations:**")
+            advice.append("**Monitoring Recommendations:**")
             for interaction in caution_interactions[:3]:  # Top 3 cautions
                 timing = interaction.get('timing_recommendation', 'Monitor closely')
                 advice.append(f"   • {timing}")
         
         # General advice
         advice.extend([
-            "📞 **Next Steps:**",
+            "**Next Steps:**",
             "   • Share these results with your healthcare provider",
             "   • Keep a medication and food diary",
             "   • Don't stop medications without medical supervision"

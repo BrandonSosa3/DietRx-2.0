@@ -133,7 +133,7 @@ class InteractionEngine:
                     
             except Exception as e:
                 logging.warning(f"AI analysis failed: {e}")
-                st.info("ℹ️ Advanced AI analysis temporarily unavailable. Basic analysis provided.")
+                st.info("Advanced AI analysis temporarily unavailable. Basic analysis provided.")
             
             from datetime import datetime
             results = AnalysisResults(
@@ -271,8 +271,8 @@ class InteractionEngine:
         recommendations = []
         
         if not interactions:
-            recommendations.append("✅ No specific precautions needed based on known interactions.")
-            recommendations.append("💡 Always consult your healthcare provider about medication and diet interactions.")
+            recommendations.append("No specific precautions needed based on known interactions.")
+            recommendations.append("Always consult your healthcare provider about medication and diet interactions.")
             return recommendations
         
         # Group by severity
@@ -280,19 +280,19 @@ class InteractionEngine:
         caution_interactions = [i for i in interactions if i.severity == Severity.CAUTION]
         
         if avoid_interactions:
-            recommendations.append("🚨 **Serious Interactions - Action Required:**")
+            recommendations.append("**Serious Interactions - Action Required:**")
             for interaction in avoid_interactions[:3]:  # Limit to top 3
                 recommendations.append(f"   • Avoid {interaction.food} while taking {interaction.medication}")
         
         if caution_interactions:
-            recommendations.append("⚠️ **Interactions Requiring Caution:**")
+            recommendations.append("**Interactions Requiring Caution:**")
             for interaction in caution_interactions[:3]:  # Limit to top 3
                 if interaction.timing_recommendation:
                     recommendations.append(f"   • {interaction.timing_recommendation}")
                 else:
                     recommendations.append(f"   • Monitor {interaction.medication} + {interaction.food} combination")
         
-        recommendations.append("📞 **Always consult your healthcare provider** before making changes to medications or diet.")
+        recommendations.append("**Always consult your healthcare provider** before making changes to medications or diet.")
         
         return recommendations
     
