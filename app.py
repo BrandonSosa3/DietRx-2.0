@@ -20,6 +20,8 @@ import plotly.express as px
 import pandas as pd
 import numpy as np
 
+print("App starting...")  # This will show in logs
+st.write("Debug: App loaded successfully")
 
 # Add project root to Python path
 project_root = Path(__file__).parent
@@ -48,6 +50,8 @@ except ImportError as e:
     st.error("Please check that components/search_interface.py exists")
     st.stop()
 
+st.title("Test - App is working!")
+st.write("If you see this, the imports work fine.")
 
 # Configure logging, logs warnings and errors
 logging.basicConfig(
@@ -57,7 +61,7 @@ logging.basicConfig(
 
 # This is the core app wrapper
 # 
-class DietRxApp:
+'''class DietRxApp:
     # here we make sure we use the ProfessionalUI class to have consistent styling
     # Then sets up the Streamlit session state (so things persist between reruns).
     def __init__(self):
@@ -134,8 +138,8 @@ class DietRxApp:
 
 
     def populate_initial_data(self):
-        '''First, it pulls the components dictionary out of session state (the “toolbox” we set up earlier).
-        Then it grabs the database manager tool from that dictionary, so we can interact with the database.'''
+        #First, it pulls the components dictionary out of session state (the “toolbox” we set up earlier).
+        #Then it grabs the database manager tool from that dictionary, so we can interact with the database.
         try:
             components = st.session_state.components
             db_manager = components['db_manager']
@@ -1291,4 +1295,4 @@ def main():
         logging.error(f"Application error: {e}")
 
 if __name__ == "__main__":
-    main()
+    main()'''
