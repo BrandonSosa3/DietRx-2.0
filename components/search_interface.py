@@ -107,35 +107,34 @@ class SearchInterface:
         """Render single food search interface"""
         st.subheader("Select Food (One at a time)")
         
-        # Search box
+        # Always show the search box first
         selected_food = st_searchbox(
             search_function=self.food_search_callback,
             placeholder="Type food name (e.g., grapefruit, spinach)...",
             label="Search Foods",
-            key="food_searchbox",
-            clear_on_submit=True
+            key="food_search_unique_key",
+            clear_on_submit=False
         )
         
-        # Handle selection - SINGLE ITEM ONLY (NO IMMEDIATE RERUN)
-        if selected_food and selected_food not in st.session_state.selected_foods:
-            # Replace any existing selection with the new one
-            st.session_state.selected_foods = [selected_food]
-            self.add_to_search_history(selected_food, 'foods')
-            # REMOVED st.rerun() - this was causing the loop!
+        # Handle new selection
+        if selected_food:
+            if not st.session_state.selected_foods or selected_food != st.session_state.selected_foods[0]:
+                st.session_state.selected_foods = [selected_food]
+                self.add_to_search_history(selected_food, 'foods')
         
-        # Display selected food
+        # Always display current selection if exists
         if st.session_state.selected_foods:
             current_food = st.session_state.selected_foods[0]
+            st.success(f"Selected Food: {current_food}")
             
-            # Show selected food in a nice box
-            st.success(f"**Selected Food:** {current_food}")
-            
-            # Simple clear button
-            if st.button("Choose Different Food", key="clear_food"):
+            # Clear button
+            if st.button("Choose Different Food", key="clear_food_btn"):
                 st.session_state.selected_foods = []
-                st.rerun()  # Only rerun on explicit button click
+                if 'food_search_unique_key' in st.session_state:
+                    del st.session_state['food_search_unique_key']
+                st.rerun()
         
-        return selected_food
+        return st.session_state.selected_foods[0] if st.session_state.selected_foods else None
     
     def render_batch_input(self):
         """Render batch input interface"""
