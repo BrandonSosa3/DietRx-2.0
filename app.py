@@ -49,19 +49,26 @@ except ImportError as e:
     st.stop()
 
 
-# Configure logging
+# Configure logging, logs warnings and errors
 logging.basicConfig(
     level=logging.WARNING,
     format='%(asctime)s - %(levelname)s - %(message)s'
 )
 
+# This is the core app wrapper
+# 
 class DietRxApp:
+    # here we make sure we use the ProfessionalUI class to have consistent styling
+    # Then sets up the Streamlit session state (so things persist between reruns).
     def __init__(self):
         self.ui = ProfessionalUI
         self.initialize_session_state()
-    
+
+    # Session state is Streamlit’s “memory” between reruns.
+    # Streamlit reruns the script every time you click a button, type something, or change state.
+    # Normally, that would reset all your variables to their defaults each time.
+    # st.session_state is Streamlit’s way of remembering values between reruns, like a little storage box.
     def initialize_session_state(self):
-        """Initialize Streamlit session state variables"""
         if 'initialized' not in st.session_state:
             st.session_state.initialized = False
             st.session_state.db_populated = False
@@ -69,8 +76,10 @@ class DietRxApp:
             st.session_state.food_names = []
             st.session_state.current_page = 'search'  # Track current page
     
+    # Builds all the tools the app needs and adds the to components dictionary and saves it in session state
+    # without this you’d reconnect to the database, reload all the APIs, rebuild the fuzzy matcher, etc.
+    # That would be slow and maybe even break things. By storing them in st.session_state.components, they live persistently as long as the app session is open.
     def setup_components(self):
-        """Initialize all components"""
         if 'components' not in st.session_state:
             try:
                 # Initialize database
@@ -112,8 +121,8 @@ class DietRxApp:
                     'search_interface': search_interface,
                     'interaction_engine': interaction_engine,
                     'results_display': results_display,
-                    'analytics_engine': analytics_engine,      # NEW
-                    'analytics_dashboard': analytics_dashboard  # NEW
+                    'analytics_engine': analytics_engine,      
+                    'analytics_dashboard': analytics_dashboard
                 }
                 
             except Exception as e:
@@ -122,9 +131,11 @@ class DietRxApp:
                 st.session_state.components = None
         
         return st.session_state.components
-        
+
+
     def populate_initial_data(self):
-        """Populate database with initial data"""
+        '''First, it pulls the components dictionary out of session state (the “toolbox” we set up earlier).
+        Then it grabs the database manager tool from that dictionary, so we can interact with the database.'''
         try:
             components = st.session_state.components
             db_manager = components['db_manager']
