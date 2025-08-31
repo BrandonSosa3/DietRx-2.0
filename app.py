@@ -1215,73 +1215,29 @@ class DietRxApp:
     def run(self):
         """Main application entry point"""
         
-        # Load professional CSS styling
-        load_css("styles/professional.css")
-        
         # Additional CSS fixes for specific components
         st.markdown("""
-        <style>
-        .stButton > button {
-            background-color: #1e40af !important;
-            color: #ffffff !important;
-            border: none !important;
-        }
-        .stButton > button * {
-            color: #ffffff !important;
-        }
-        .stButton > button span {
-            color: #ffffff !important;
-        }
-        /* Fix search box styling */
-        .stSelectbox > div > div {
-            border: 1px solid #d1d5db !important;
-            border-radius: 6px !important;
-            background-color: white !important;
-        }
-
-        /* Fix searchbox component styling */
-        div[data-testid="stSelectbox"] > div {
-            border: 1px solid #d1d5db !important;
-            border-radius: 6px !important;
-            box-shadow: none !important;
-        }
-
-        /* Override streamlit-searchbox styling */
-        .streamlit-searchbox {
-            border: 1px solid #d1d5db !important;
-            border-radius: 6px !important;
-            background-color: white !important;
-        }
-
-        /* Remove any black borders/outlines */
-        input, select, textarea {
-            border: 1px solid #d1d5db !important;
-            border-radius: 6px !important;
-            outline: none !important;
-        }
-
-        input:focus, select:focus, textarea:focus {
-            border-color: #3b82f6 !important;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
-            outline: none !important;
-        }
-
-        /* Fix any weird black squares */
-        div[data-baseweb="select"] {
-            border: 1px solid #d1d5db !important;
-            background-color: white !important;
-        }
-
-        div[data-baseweb="select"]:hover {
-            border-color: #9ca3af !important;
-        }
-
-        div[data-baseweb="select"]:focus-within {
-            border-color: #3b82f6 !important;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
-        }
-        </style>
-        """, unsafe_allow_html=True)
+            <style>
+            /* Clean, minimal styling that actually works */
+            .stButton > button {
+                background-color: #1e40af;
+                color: white;
+                border: none;
+                border-radius: 6px;
+                padding: 0.5rem 1rem;
+            }
+            
+            /* Remove Streamlit branding */
+            #MainMenu {visibility: hidden;}
+            footer {visibility: hidden;}
+            
+            /* Clean input styling */
+            .stSelectbox > div > div {
+                border: 1px solid #d1d5db;
+                border-radius: 6px;
+            }
+            </style>
+            """, unsafe_allow_html=True)
 
         # Initialize components
         components = self.setup_components()
