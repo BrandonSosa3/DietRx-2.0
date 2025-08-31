@@ -61,7 +61,7 @@ logging.basicConfig(
 
 # This is the core app wrapper
 # 
-'''class DietRxApp:
+class DietRxApp:
     # here we make sure we use the ProfessionalUI class to have consistent styling
     # Then sets up the Streamlit session state (so things persist between reruns).
     def __init__(self):
@@ -1295,4 +1295,4 @@ def main():
         logging.error(f"Application error: {e}")
 
 if __name__ == "__main__":
-    main()'''
+    main()
