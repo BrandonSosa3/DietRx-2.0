@@ -1,9 +1,16 @@
 /* Professional Medical Application Styling */
 
 /* Main container styling */
-.stApp {
-    background-color: #fffffe;
-    font-family: 'Segoe UI', 'Roboto', sans-serif;
+.stApp .stApp {
+    background-color: #fffffe !important;
+    font-family: 'Segoe UI', 'Roboto', sans-serif !important;
+}
+
+/* Force header styling */
+.stApp h1, .stApp h2, .stApp h3 {
+    color: #1e3a8a !important;
+    font-weight: 500 !important;
+    letter-spacing: -0.025em !important;
 }
 
 /* Headers and typography */

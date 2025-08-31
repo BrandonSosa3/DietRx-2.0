@@ -47,18 +47,25 @@ except ImportError as e:
     st.error("Please check that components/search_interface.py exists")
     st.stop()
 
-
 def load_css(file_path):
-    """Load CSS file"""
+    """Load CSS file and apply it to the Streamlit app"""
     try:
-        with open(file_path) as f:
-            st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
-        print(f"Debug: CSS loaded successfully from {file_path}")
+        with open(file_path, 'r') as f:
+            css_content = f.read()
+        
+        # Debug: Show how much CSS was loaded
+        print(f"Debug: CSS file found, loaded {len(css_content)} characters")
+        print(f"Debug: First 200 chars: {css_content[:200]}")
+        
+        st.markdown(f'<style>{css_content}</style>', unsafe_allow_html=True)
+        st.success(f"CSS loaded: {len(css_content)} characters from {file_path}")
+        
     except FileNotFoundError:
         print(f"Debug: CSS file not found at {file_path}")
         st.error(f"CSS file not found: {file_path}")
     except Exception as e:
         print(f"Debug: Error loading CSS: {e}")
+        st.error(f"Error loading CSS: {e}")
 
 
 # Configure logging, logs warnings and errors
