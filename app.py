@@ -47,8 +47,19 @@ except ImportError as e:
     st.error("Please check that components/search_interface.py exists")
     st.stop()
 
-st.title("Test - App is working!")
-st.write("If you see this, the imports work fine.")
+
+def load_css(file_path):
+    """Load CSS file"""
+    try:
+        with open(file_path) as f:
+            st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
+        print(f"Debug: CSS loaded successfully from {file_path}")
+    except FileNotFoundError:
+        print(f"Debug: CSS file not found at {file_path}")
+        st.error(f"CSS file not found: {file_path}")
+    except Exception as e:
+        print(f"Debug: Error loading CSS: {e}")
+
 
 # Configure logging, logs warnings and errors
 logging.basicConfig(
@@ -1192,13 +1203,18 @@ class DietRxApp:
             
         except Exception as e:
             st.error(f"Error resetting database: {e}")
+
+
     
     def run(self):
         """Main application entry point"""
+        
+        # Load professional CSS styling
+        load_css("styles/professional.css")
+        
+        # Additional CSS fixes for specific components
         st.markdown("""
         <style>
-        /* Existing CSS... */
-
         /* Fix search box styling */
         .stSelectbox > div > div {
             border: 1px solid #d1d5db !important;
