@@ -129,6 +129,36 @@ header {visibility: hidden !important;}
     border-right: 1px solid #e2e8f0 !important;
 }
 
+/* Fix sidebar text visibility - Force dark text color */
+.stApp [data-testid="stSidebar"] *,
+[data-testid="stSidebar"] *,
+.stApp .css-1d391kg *,
+.css-1d391kg * {
+    color: #374151 !important;
+}
+
+/* Sidebar navigation text - specific fixes */
+.stApp [data-testid="stSidebar"] .stRadio label,
+[data-testid="stSidebar"] .stRadio label,
+.stApp [data-testid="stSidebar"] .stSelectbox label,
+[data-testid="stSidebar"] .stSelectbox label {
+    color: #1f2937 !important;
+    font-weight: 500 !important;
+}
+
+/* Sidebar button text */
+.stApp [data-testid="stSidebar"] .stButton button,
+[data-testid="stSidebar"] .stButton button {
+    color: white !important;
+    background-color: #1e40af !important;
+}
+
+/* Sidebar radio button text */
+.stApp [data-testid="stSidebar"] .stRadio > div > div > div > label,
+[data-testid="stSidebar"] .stRadio > div > div > div > label {
+    color: #1f2937 !important;
+}
+
 /* Metric styling */
 .stApp .metric-container,
 .metric-container {
@@ -226,7 +256,7 @@ header {visibility: hidden !important;}
     max-width: 1200px !important;
 }
 
-/* Input field styling */
+/* Input field styling - Remove black borders/boxes */
 .stApp input,
 .stApp select,
 .stApp textarea,
@@ -235,6 +265,7 @@ input, select, textarea {
     border-radius: 6px !important;
     outline: none !important;
     background-color: white !important;
+    box-shadow: none !important;
 }
 
 .stApp input:focus,
@@ -244,4 +275,61 @@ input:focus, select:focus, textarea:focus {
     border-color: #3b82f6 !important;
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
     outline: none !important;
+}
+
+/* Remove black squares from analytics dashboard */
+.stApp div[data-baseweb="select"],
+div[data-baseweb="select"] {
+    border: 1px solid #d1d5db !important;
+    background-color: white !important;
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+.stApp div[data-baseweb="select"]:hover,
+div[data-baseweb="select"]:hover {
+    border-color: #9ca3af !important;
+}
+
+.stApp div[data-baseweb="select"]:focus-within,
+div[data-baseweb="select"]:focus-within {
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+}
+
+/* Fix any remaining black box issues */
+.stApp *[style*="border: 1px solid black"],
+*[style*="border: 1px solid black"] {
+    border: 1px solid #d1d5db !important;
+}
+
+/* Remove black outlines from all elements */
+.stApp *,
+* {
+    outline: none !important;
+}
+
+/* Fix analytics dashboard specific elements */
+.stApp .stPlotlyChart,
+.stPlotlyChart {
+    background-color: white !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 8px !important;
+    box-shadow: none !important;
+}
+
+/* Fix metric cards */
+.stApp .stMetric,
+.stMetric {
+    background-color: white !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 8px !important;
+    padding: 1rem !important;
+    box-shadow: none !important;
+}
+
+/* Fix text readability everywhere */
+.stApp .stMarkdown *,
+.stMarkdown * {
+    color: #374151 !important;
 }
