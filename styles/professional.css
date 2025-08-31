@@ -44,21 +44,32 @@ h1, h2, h3 {
 footer {visibility: hidden !important;}
 header {visibility: hidden !important;}
 
-/* Professional button styling - Force override */
+/* Professional button styling - Force override with visible text */
 .stApp .stButton > button,
 .stButton > button {
     background-color: #1e40af !important;
-    color: white !important;
+    color: #ffffff !important;
     border: none !important;
     border-radius: 6px !important;
     padding: 0.5rem 1.5rem !important;
     font-weight: 500 !important;
     transition: background-color 0.2s !important;
+    text-decoration: none !important;
 }
 
 .stApp .stButton > button:hover,
 .stButton > button:hover {
     background-color: #1d4ed8 !important;
+    color: #ffffff !important;
+}
+
+/* Ensure button text is always visible */
+.stApp .stButton > button span,
+.stButton > button span,
+.stApp .stButton > button p,
+.stButton > button p {
+    color: #ffffff !important;
+    font-weight: 500 !important;
 }
 
 /* Secondary button styling */
@@ -127,36 +138,6 @@ header {visibility: hidden !important;}
 [data-testid="stSidebar"] {
     background-color: #f8fafc !important;
     border-right: 1px solid #e2e8f0 !important;
-}
-
-/* Fix sidebar text visibility - Force dark text color */
-.stApp [data-testid="stSidebar"] *,
-[data-testid="stSidebar"] *,
-.stApp .css-1d391kg *,
-.css-1d391kg * {
-    color: #374151 !important;
-}
-
-/* Sidebar navigation text - specific fixes */
-.stApp [data-testid="stSidebar"] .stRadio label,
-[data-testid="stSidebar"] .stRadio label,
-.stApp [data-testid="stSidebar"] .stSelectbox label,
-[data-testid="stSidebar"] .stSelectbox label {
-    color: #1f2937 !important;
-    font-weight: 500 !important;
-}
-
-/* Sidebar button text */
-.stApp [data-testid="stSidebar"] .stButton button,
-[data-testid="stSidebar"] .stButton button {
-    color: white !important;
-    background-color: #1e40af !important;
-}
-
-/* Sidebar radio button text */
-.stApp [data-testid="stSidebar"] .stRadio > div > div > div > label,
-[data-testid="stSidebar"] .stRadio > div > div > div > label {
-    color: #1f2937 !important;
 }
 
 /* Metric styling */
@@ -237,14 +218,33 @@ header {visibility: hidden !important;}
     margin: 2rem 0 !important;
 }
 
-/* Additional overrides for common Streamlit elements */
+/* Additional overrides for common Streamlit elements - Fix text visibility */
 .stApp .stMarkdown,
 .stMarkdown {
     color: #374151 !important;
+    background-color: transparent !important;
 }
 
 .stApp .stText,
 .stText {
+    color: #374151 !important;
+    background-color: transparent !important;
+}
+
+/* Fix white text on white background issues */
+.stApp p, .stApp div, .stApp span,
+p, div, span {
+    color: #374151 !important;
+}
+
+/* Ensure all text elements have proper color */
+.stApp [data-testid="stMarkdownContainer"],
+[data-testid="stMarkdownContainer"] {
+    color: #374151 !important;
+}
+
+.stApp .element-container,
+.element-container {
     color: #374151 !important;
 }
 
@@ -256,7 +256,7 @@ header {visibility: hidden !important;}
     max-width: 1200px !important;
 }
 
-/* Input field styling - Remove black borders/boxes */
+/* Input field styling - Remove black boxes */
 .stApp input,
 .stApp select,
 .stApp textarea,
@@ -265,6 +265,7 @@ input, select, textarea {
     border-radius: 6px !important;
     outline: none !important;
     background-color: white !important;
+    color: #374151 !important;
     box-shadow: none !important;
 }
 
@@ -277,59 +278,43 @@ input:focus, select:focus, textarea:focus {
     outline: none !important;
 }
 
-/* Remove black squares from analytics dashboard */
-.stApp div[data-baseweb="select"],
-div[data-baseweb="select"] {
+/* Remove black boxes from select elements */
+.stApp [data-baseweb="select"],
+[data-baseweb="select"] {
     border: 1px solid #d1d5db !important;
     background-color: white !important;
+    border-radius: 6px !important;
     box-shadow: none !important;
-    outline: none !important;
 }
 
-.stApp div[data-baseweb="select"]:hover,
-div[data-baseweb="select"]:hover {
-    border-color: #9ca3af !important;
-}
-
-.stApp div[data-baseweb="select"]:focus-within,
-div[data-baseweb="select"]:focus-within {
-    border-color: #3b82f6 !important;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
-}
-
-/* Fix any remaining black box issues */
-.stApp *[style*="border: 1px solid black"],
-*[style*="border: 1px solid black"] {
-    border: 1px solid #d1d5db !important;
-}
-
-/* Remove black outlines from all elements */
-.stApp *,
-* {
-    outline: none !important;
-}
-
-/* Fix analytics dashboard specific elements */
-.stApp .stPlotlyChart,
-.stPlotlyChart {
+.stApp [data-baseweb="select"] > div,
+[data-baseweb="select"] > div {
     background-color: white !important;
-    border: 1px solid #e2e8f0 !important;
-    border-radius: 8px !important;
-    box-shadow: none !important;
-}
-
-/* Fix metric cards */
-.stApp .stMetric,
-.stMetric {
-    background-color: white !important;
-    border: 1px solid #e2e8f0 !important;
-    border-radius: 8px !important;
-    padding: 1rem !important;
-    box-shadow: none !important;
-}
-
-/* Fix text readability everywhere */
-.stApp .stMarkdown *,
-.stMarkdown * {
     color: #374151 !important;
+    border: none !important;
+}
+
+/* Fix dropdown arrows and indicators */
+.stApp [data-baseweb="select"] svg,
+[data-baseweb="select"] svg {
+    color: #6b7280 !important;
+}
+
+/* Remove black outlines from all form elements */
+.stApp *:focus,
+*:focus {
+    outline: none !important;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2) !important;
+}
+
+/* Fix specific Streamlit component black boxes */
+.stApp [class*="css-"],
+[class*="css-"] {
+    box-shadow: none !important;
+}
+
+.stApp [class*="css-"]:focus,
+[class*="css-"]:focus {
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2) !important;
+    outline: none !important;
 }
