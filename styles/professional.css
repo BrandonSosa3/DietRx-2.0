@@ -1,179 +1,247 @@
-/* Professional Medical Application Styling */
+/* Professional Medical Application Styling - Enhanced Specificity */
 
-/* Main container styling */
-.stApp .stApp {
+/* Force all styles to have higher priority */
+.stApp, .stApp * {
+    box-sizing: border-box !important;
+}
+
+/* Main container styling - Force override */
+.stApp {
     background-color: #fffffe !important;
     font-family: 'Segoe UI', 'Roboto', sans-serif !important;
 }
 
-/* Force header styling */
-.stApp h1, .stApp h2, .stApp h3 {
+/* Force header styling with maximum specificity */
+.stApp h1, .stApp h2, .stApp h3,
+h1, h2, h3 {
     color: #1e3a8a !important;
     font-weight: 500 !important;
     letter-spacing: -0.025em !important;
 }
 
-/* Headers and typography */
-h1, h2, h3 {
-    color: #1e3a8a;
-    font-weight: 500;
-    letter-spacing: -0.025em;
+.stApp h1, h1 {
+    font-size: 2rem !important;
+    border-bottom: 2px solid #e5e7eb !important;
+    padding-bottom: 0.5rem !important;
+    margin-bottom: 1.5rem !important;
 }
 
-h1 {
-    font-size: 2rem;
-    border-bottom: 2px solid #e5e7eb;
-    padding-bottom: 0.5rem;
-    margin-bottom: 1.5rem;
+.stApp h2, h2 {
+    font-size: 1.5rem !important;
+    color: #374151 !important;
+    margin-top: 2rem !important;
+    margin-bottom: 1rem !important;
 }
 
-h2 {
-    font-size: 1.5rem;
-    color: #374151;
-    margin-top: 2rem;
-    margin-bottom: 1rem;
-}
-
-h3 {
-    font-size: 1.25rem;
-    color: #4b5563;
-    margin-bottom: 0.75rem;
+.stApp h3, h3 {
+    font-size: 1.25rem !important;
+    color: #4b5563 !important;
+    margin-bottom: 0.75rem !important;
 }
 
 /* Remove Streamlit branding */
-#MainMenu {visibility: hidden;}
-footer {visibility: hidden;}
-header {visibility: hidden;}
+#MainMenu {visibility: hidden !important;}
+footer {visibility: hidden !important;}
+header {visibility: hidden !important;}
 
-/* Professional button styling */
+/* Professional button styling - Force override */
+.stApp .stButton > button,
 .stButton > button {
-    background-color: #1e40af;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    padding: 0.5rem 1.5rem;
-    font-weight: 500;
-    transition: background-color 0.2s;
+    background-color: #1e40af !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 6px !important;
+    padding: 0.5rem 1.5rem !important;
+    font-weight: 500 !important;
+    transition: background-color 0.2s !important;
 }
 
+.stApp .stButton > button:hover,
 .stButton > button:hover {
-    background-color: #1d4ed8;
+    background-color: #1d4ed8 !important;
 }
 
 /* Secondary button styling */
+.stApp .stButton > button[kind="secondary"],
 .stButton > button[kind="secondary"] {
-    background-color: #f8fafc;
-    color: #475569;
-    border: 1px solid #cbd5e1;
+    background-color: #f8fafc !important;
+    color: #475569 !important;
+    border: 1px solid #cbd5e1 !important;
 }
 
+.stApp .stButton > button[kind="secondary"]:hover,
 .stButton > button[kind="secondary"]:hover {
-    background-color: #f1f5f9;
+    background-color: #f1f5f9 !important;
 }
 
 /* Professional info boxes */
+.stApp .stAlert,
 .stAlert {
-    border-radius: 8px;
-    border-left: 4px solid;
-    padding: 1rem;
-    margin: 1rem 0;
+    border-radius: 8px !important;
+    border-left: 4px solid !important;
+    padding: 1rem !important;
+    margin: 1rem 0 !important;
 }
 
 /* Success messages */
+.stApp .stAlert[data-baseweb="notification"][kind="success"],
 .stAlert[data-baseweb="notification"][kind="success"] {
-    background-color: #f0fdf4;
-    border-left-color: #22c55e;
-    color: #166534;
+    background-color: #f0fdf4 !important;
+    border-left-color: #22c55e !important;
+    color: #166534 !important;
 }
 
 /* Warning messages */
+.stApp .stAlert[data-baseweb="notification"][kind="warning"],
 .stAlert[data-baseweb="notification"][kind="warning"] {
-    background-color: #fffbeb;
-    border-left-color: #f59e0b;
-    color: #92400e;
+    background-color: #fffbeb !important;
+    border-left-color: #f59e0b !important;
+    color: #92400e !important;
 }
 
 /* Error messages */
+.stApp .stAlert[data-baseweb="notification"][kind="error"],
 .stAlert[data-baseweb="notification"][kind="error"] {
-    background-color: #fef2f2;
-    border-left-color: #ef4444;
-    color: #dc2626;
+    background-color: #fef2f2 !important;
+    border-left-color: #ef4444 !important;
+    color: #dc2626 !important;
 }
 
 /* Info messages */
+.stApp .stAlert[data-baseweb="notification"][kind="info"],
 .stAlert[data-baseweb="notification"][kind="info"] {
-    background-color: #f0f9ff;
-    border-left-color: #3b82f6;
-    color: #1e40af;
+    background-color: #f0f9ff !important;
+    border-left-color: #3b82f6 !important;
+    color: #1e40af !important;
 }
 
-/* Professional sidebar */
+/* Professional sidebar - Force override */
+.stApp .css-1d391kg,
 .css-1d391kg {
-    background-color: #f8fafc;
-    border-right: 1px solid #e2e8f0;
+    background-color: #f8fafc !important;
+    border-right: 1px solid #e2e8f0 !important;
+}
+
+/* Sidebar alternative selectors for newer Streamlit versions */
+.stApp [data-testid="stSidebar"],
+[data-testid="stSidebar"] {
+    background-color: #f8fafc !important;
+    border-right: 1px solid #e2e8f0 !important;
 }
 
 /* Metric styling */
+.stApp .metric-container,
 .metric-container {
-    background-color: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    padding: 1rem;
-    margin: 0.5rem 0;
+    background-color: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 8px !important;
+    padding: 1rem !important;
+    margin: 0.5rem 0 !important;
 }
 
 /* Table styling */
+.stApp .stDataFrame,
 .stDataFrame {
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 8px !important;
 }
 
-/* Search box styling */
-.stSelectbox > div > div {
-    border-radius: 6px;
-    border-color: #d1d5db;
+/* Search box styling - Multiple selectors for compatibility */
+.stApp .stSelectbox > div > div,
+.stSelectbox > div > div,
+.stApp [data-testid="stSelectbox"] > div,
+[data-testid="stSelectbox"] > div {
+    border-radius: 6px !important;
+    border: 1px solid #d1d5db !important;
+    background-color: white !important;
 }
 
 /* Professional spacing */
+.stApp .main-content,
 .main-content {
-    padding: 2rem;
-    max-width: 1200px;
-    margin: 0 auto;
+    padding: 2rem !important;
+    max-width: 1200px !important;
+    margin: 0 auto !important;
 }
 
 /* Status indicators without emojis */
+.stApp .status-indicator,
 .status-indicator {
-    display: inline-block;
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    margin-right: 8px;
+    display: inline-block !important;
+    width: 12px !important;
+    height: 12px !important;
+    border-radius: 50% !important;
+    margin-right: 8px !important;
 }
 
+.stApp .status-operational,
 .status-operational {
-    background-color: #22c55e;
+    background-color: #22c55e !important;
 }
 
+.stApp .status-warning,
 .status-warning {
-    background-color: #f59e0b;
+    background-color: #f59e0b !important;
 }
 
+.stApp .status-error,
 .status-error {
-    background-color: #ef4444;
+    background-color: #ef4444 !important;
 }
 
 /* Professional card styling */
+.stApp .info-card,
 .info-card {
-    background-color: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    padding: 1.5rem;
-    margin: 1rem 0;
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+    background-color: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 8px !important;
+    padding: 1.5rem !important;
+    margin: 1rem 0 !important;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1) !important;
 }
 
 /* Section dividers */
+.stApp .section-divider,
 .section-divider {
-    border-top: 1px solid #e2e8f0;
-    margin: 2rem 0;
+    border-top: 1px solid #e2e8f0 !important;
+    margin: 2rem 0 !important;
+}
+
+/* Additional overrides for common Streamlit elements */
+.stApp .stMarkdown,
+.stMarkdown {
+    color: #374151 !important;
+}
+
+.stApp .stText,
+.stText {
+    color: #374151 !important;
+}
+
+/* Force main content area styling */
+.stApp .main .block-container,
+.main .block-container {
+    padding-top: 2rem !important;
+    padding-bottom: 2rem !important;
+    max-width: 1200px !important;
+}
+
+/* Input field styling */
+.stApp input,
+.stApp select,
+.stApp textarea,
+input, select, textarea {
+    border: 1px solid #d1d5db !important;
+    border-radius: 6px !important;
+    outline: none !important;
+    background-color: white !important;
+}
+
+.stApp input:focus,
+.stApp select:focus,
+.stApp textarea:focus,
+input:focus, select:focus, textarea:focus {
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+    outline: none !important;
 }
