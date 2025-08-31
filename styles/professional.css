@@ -1,39 +1,31 @@
-/* Professional Medical Application Styling - Enhanced Specificity */
+/* Professional Medical Application Styling - Clean Version */
 
-/* Force all styles to have higher priority */
-.stApp, .stApp * {
-    box-sizing: border-box !important;
-}
-
-/* Main container styling - Force override */
+/* Main container styling */
 .stApp {
-    background-color: #fffffe !important;
+    background-color: #ffffff !important;
     font-family: 'Segoe UI', 'Roboto', sans-serif !important;
 }
 
-/* Force header styling with maximum specificity */
-.stApp h1, .stApp h2, .stApp h3,
+/* Headers - Clean and simple */
 h1, h2, h3 {
     color: #1e3a8a !important;
     font-weight: 500 !important;
-    letter-spacing: -0.025em !important;
 }
 
-.stApp h1, h1 {
+h1 {
     font-size: 2rem !important;
+    margin-bottom: 1.5rem !important;
     border-bottom: 2px solid #e5e7eb !important;
     padding-bottom: 0.5rem !important;
-    margin-bottom: 1.5rem !important;
 }
 
-.stApp h2, h2 {
+h2 {
     font-size: 1.5rem !important;
     color: #374151 !important;
-    margin-top: 2rem !important;
-    margin-bottom: 1rem !important;
+    margin: 2rem 0 1rem 0 !important;
 }
 
-.stApp h3, h3 {
+h3 {
     font-size: 1.25rem !important;
     color: #4b5563 !important;
     margin-bottom: 0.75rem !important;
@@ -44,49 +36,102 @@ h1, h2, h3 {
 footer {visibility: hidden !important;}
 header {visibility: hidden !important;}
 
-/* Professional button styling - Force override with visible text */
-.stApp .stButton > button,
+/* BUTTON FIXES - Make them blue with white text */
 .stButton > button {
     background-color: #1e40af !important;
     color: #ffffff !important;
-    border: none !important;
+    border: 1px solid #1e40af !important;
     border-radius: 6px !important;
     padding: 0.5rem 1.5rem !important;
     font-weight: 500 !important;
-    transition: background-color 0.2s !important;
-    text-decoration: none !important;
+    font-size: 14px !important;
 }
 
-.stApp .stButton > button:hover,
 .stButton > button:hover {
     background-color: #1d4ed8 !important;
     color: #ffffff !important;
+    border-color: #1d4ed8 !important;
 }
 
-/* Ensure button text is always visible */
-.stApp .stButton > button span,
-.stButton > button span,
-.stApp .stButton > button p,
-.stButton > button p {
+.stButton > button:active {
+    background-color: #1e40af !important;
     color: #ffffff !important;
-    font-weight: 500 !important;
 }
 
-/* Secondary button styling */
-.stApp .stButton > button[kind="secondary"],
-.stButton > button[kind="secondary"] {
+/* SEARCH BOX FIXES - Remove black borders */
+.stSelectbox > div > div {
+    background-color: #ffffff !important;
+    border: 1px solid #d1d5db !important;
+    border-radius: 6px !important;
+    box-shadow: none !important;
+}
+
+.stSelectbox > div > div:hover {
+    border-color: #9ca3af !important;
+}
+
+.stSelectbox > div > div:focus-within {
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1) !important;
+}
+
+/* Fix searchbox component specifically */
+[data-testid="stSelectbox"] {
+    background-color: #ffffff !important;
+}
+
+[data-testid="stSelectbox"] > div {
+    background-color: #ffffff !important;
+    border: 1px solid #d1d5db !important;
+    border-radius: 6px !important;
+    box-shadow: none !important;
+}
+
+/* Remove black outlines from ALL inputs */
+input, select, textarea {
+    background-color: #ffffff !important;
+    border: 1px solid #d1d5db !important;
+    border-radius: 6px !important;
+    box-shadow: none !important;
+    outline: none !important;
+    color: #374151 !important;
+}
+
+input:focus, select:focus, textarea:focus {
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1) !important;
+    outline: none !important;
+}
+
+/* Fix any remaining black boxes */
+div[data-baseweb="select"] {
+    background-color: #ffffff !important;
+    border: 1px solid #d1d5db !important;
+    border-radius: 6px !important;
+    box-shadow: none !important;
+}
+
+div[data-baseweb="select"]:focus-within {
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1) !important;
+}
+
+/* Text color fixes */
+p, div, span {
+    color: #374151 !important;
+}
+
+.stMarkdown {
+    color: #374151 !important;
+}
+
+/* Professional sidebar */
+[data-testid="stSidebar"] {
     background-color: #f8fafc !important;
-    color: #475569 !important;
-    border: 1px solid #cbd5e1 !important;
+    border-right: 1px solid #e2e8f0 !important;
 }
 
-.stApp .stButton > button[kind="secondary"]:hover,
-.stButton > button[kind="secondary"]:hover {
-    background-color: #f1f5f9 !important;
-}
-
-/* Professional info boxes */
-.stApp .stAlert,
+/* Alert boxes */
 .stAlert {
     border-radius: 8px !important;
     border-left: 4px solid !important;
@@ -95,226 +140,31 @@ header {visibility: hidden !important;}
 }
 
 /* Success messages */
-.stApp .stAlert[data-baseweb="notification"][kind="success"],
-.stAlert[data-baseweb="notification"][kind="success"] {
+.stAlert[kind="success"] {
     background-color: #f0fdf4 !important;
     border-left-color: #22c55e !important;
     color: #166534 !important;
 }
 
-/* Warning messages */
-.stApp .stAlert[data-baseweb="notification"][kind="warning"],
-.stAlert[data-baseweb="notification"][kind="warning"] {
-    background-color: #fffbeb !important;
-    border-left-color: #f59e0b !important;
-    color: #92400e !important;
-}
-
 /* Error messages */
-.stApp .stAlert[data-baseweb="notification"][kind="error"],
-.stAlert[data-baseweb="notification"][kind="error"] {
+.stAlert[kind="error"] {
     background-color: #fef2f2 !important;
     border-left-color: #ef4444 !important;
     color: #dc2626 !important;
 }
 
-/* Info messages */
-.stApp .stAlert[data-baseweb="notification"][kind="info"],
-.stAlert[data-baseweb="notification"][kind="info"] {
-    background-color: #f0f9ff !important;
-    border-left-color: #3b82f6 !important;
-    color: #1e40af !important;
-}
-
-/* Professional sidebar - Force override */
-.stApp .css-1d391kg,
-.css-1d391kg {
-    background-color: #f8fafc !important;
-    border-right: 1px solid #e2e8f0 !important;
-}
-
-/* Sidebar alternative selectors for newer Streamlit versions */
-.stApp [data-testid="stSidebar"],
-[data-testid="stSidebar"] {
-    background-color: #f8fafc !important;
-    border-right: 1px solid #e2e8f0 !important;
-}
-
-/* Metric styling */
-.stApp .metric-container,
-.metric-container {
-    background-color: #ffffff !important;
-    border: 1px solid #e2e8f0 !important;
-    border-radius: 8px !important;
-    padding: 1rem !important;
-    margin: 0.5rem 0 !important;
-}
-
-/* Table styling */
-.stApp .stDataFrame,
+/* Tables */
 .stDataFrame {
     border: 1px solid #e2e8f0 !important;
     border-radius: 8px !important;
 }
 
-/* Search box styling - Multiple selectors for compatibility */
-.stApp .stSelectbox > div > div,
-.stSelectbox > div > div,
-.stApp [data-testid="stSelectbox"] > div,
-[data-testid="stSelectbox"] > div {
-    border-radius: 6px !important;
-    border: 1px solid #d1d5db !important;
-    background-color: white !important;
-}
-
-/* Professional spacing */
-.stApp .main-content,
-.main-content {
-    padding: 2rem !important;
-    max-width: 1200px !important;
-    margin: 0 auto !important;
-}
-
-/* Status indicators without emojis */
-.stApp .status-indicator,
-.status-indicator {
-    display: inline-block !important;
-    width: 12px !important;
-    height: 12px !important;
-    border-radius: 50% !important;
-    margin-right: 8px !important;
-}
-
-.stApp .status-operational,
-.status-operational {
-    background-color: #22c55e !important;
-}
-
-.stApp .status-warning,
-.status-warning {
-    background-color: #f59e0b !important;
-}
-
-.stApp .status-error,
-.status-error {
-    background-color: #ef4444 !important;
-}
-
-/* Professional card styling */
-.stApp .info-card,
-.info-card {
-    background-color: #ffffff !important;
-    border: 1px solid #e2e8f0 !important;
-    border-radius: 8px !important;
-    padding: 1.5rem !important;
-    margin: 1rem 0 !important;
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1) !important;
-}
-
-/* Section dividers */
-.stApp .section-divider,
-.section-divider {
-    border-top: 1px solid #e2e8f0 !important;
-    margin: 2rem 0 !important;
-}
-
-/* Additional overrides for common Streamlit elements - Fix text visibility */
-.stApp .stMarkdown,
-.stMarkdown {
-    color: #374151 !important;
-    background-color: transparent !important;
-}
-
-.stApp .stText,
-.stText {
-    color: #374151 !important;
-    background-color: transparent !important;
-}
-
-/* Fix white text on white background issues */
-.stApp p, .stApp div, .stApp span,
-p, div, span {
-    color: #374151 !important;
-}
-
-/* Ensure all text elements have proper color */
-.stApp [data-testid="stMarkdownContainer"],
-[data-testid="stMarkdownContainer"] {
-    color: #374151 !important;
-}
-
-.stApp .element-container,
-.element-container {
-    color: #374151 !important;
-}
-
-/* Force main content area styling */
-.stApp .main .block-container,
-.main .block-container {
-    padding-top: 2rem !important;
-    padding-bottom: 2rem !important;
-    max-width: 1200px !important;
-}
-
-/* Input field styling - Remove black boxes */
-.stApp input,
-.stApp select,
-.stApp textarea,
-input, select, textarea {
-    border: 1px solid #d1d5db !important;
-    border-radius: 6px !important;
-    outline: none !important;
-    background-color: white !important;
-    color: #374151 !important;
-    box-shadow: none !important;
-}
-
-.stApp input:focus,
-.stApp select:focus,
-.stApp textarea:focus,
-input:focus, select:focus, textarea:focus {
-    border-color: #3b82f6 !important;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+/* Remove ALL focus outlines that create black boxes */
+* {
     outline: none !important;
 }
 
-/* Remove black boxes from select elements */
-.stApp [data-baseweb="select"],
-[data-baseweb="select"] {
-    border: 1px solid #d1d5db !important;
-    background-color: white !important;
-    border-radius: 6px !important;
-    box-shadow: none !important;
-}
-
-.stApp [data-baseweb="select"] > div,
-[data-baseweb="select"] > div {
-    background-color: white !important;
-    color: #374151 !important;
-    border: none !important;
-}
-
-/* Fix dropdown arrows and indicators */
-.stApp [data-baseweb="select"] svg,
-[data-baseweb="select"] svg {
-    color: #6b7280 !important;
-}
-
-/* Remove black outlines from all form elements */
-.stApp *:focus,
 *:focus {
     outline: none !important;
-    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2) !important;
-}
-
-/* Fix specific Streamlit component black boxes */
-.stApp [class*="css-"],
-[class*="css-"] {
-    box-shadow: none !important;
-}
-
-.stApp [class*="css-"]:focus,
-[class*="css-"]:focus {
-    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2) !important;
-    outline: none !important;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15) !important;
 }
