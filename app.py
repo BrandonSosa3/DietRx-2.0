@@ -20,9 +20,6 @@ import plotly.express as px
 import pandas as pd
 import numpy as np
 
-print("App starting...")  # This will show in logs
-st.write("Debug: App loaded successfully")
-
 # Add project root to Python path
 project_root = Path(__file__).parent
 sys.path.insert(0, str(project_root))
