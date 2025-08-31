@@ -58,7 +58,6 @@ def load_css(file_path):
         print(f"Debug: First 200 chars: {css_content[:200]}")
         
         st.markdown(f'<style>{css_content}</style>', unsafe_allow_html=True)
-        st.success(f"CSS loaded: {len(css_content)} characters from {file_path}")
         
     except FileNotFoundError:
         print(f"Debug: CSS file not found at {file_path}")
@@ -1222,6 +1221,17 @@ class DietRxApp:
         # Additional CSS fixes for specific components
         st.markdown("""
         <style>
+        .stButton > button {
+            background-color: #1e40af !important;
+            color: #ffffff !important;
+            border: none !important;
+        }
+        .stButton > button * {
+            color: #ffffff !important;
+        }
+        .stButton > button span {
+            color: #ffffff !important;
+        }
         /* Fix search box styling */
         .stSelectbox > div > div {
             border: 1px solid #d1d5db !important;
