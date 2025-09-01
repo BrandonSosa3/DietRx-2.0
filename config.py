@@ -22,11 +22,3 @@ CACHE_EXPIRY_HOURS = 24
 # Fuzzy matching thresholds
 FUZZY_MATCH_THRESHOLD = 80  # Minimum similarity score
 MAX_SUGGESTIONS = 5
-
-# Streamlit settings (not used in config, moved to app.py)
-PAGE_TITLE = "DietRx Enhanced"
-PAGE_ICON = "💊"
-LAYOUT = "wide"
-
-# API Keys (if needed - most of these APIs are free without keys)
-USDA_API_KEY = os.getenv("USDA_API_KEY", "")  # Optional but recommended

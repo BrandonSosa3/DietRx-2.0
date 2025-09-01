@@ -1,3 +1,11 @@
+# import general streamlit:
+# Unlike Flask, Django, or FastAPI, Streamlit doesn’t keep your Python script running forever.
+# Instead: Every time the user clicks a button, changes a dropdown, types into a box, etc., Streamlit reruns your entire app.py script from top to bottom.
+# This means that any normal Python variable (like x = 10 or my_list = []) will get reset every time the script reruns.
+# So without a special system, you can’t keep track of values across user interactions.
+# st.session_state is like a dictionary that Streamlit gives you to store variables that persist across reruns.
+# so when your app state changes and the entire app.py is rerun, your values are not reset and they persist. 
+
 import streamlit as st
 
 # Configure Streamlit page FIRST
@@ -74,7 +82,6 @@ logging.basicConfig(
 )
 
 # This is the core app wrapper
-# 
 class DietRxApp:
     # here we make sure we use the ProfessionalUI class to have consistent styling
     # Then sets up the Streamlit session state (so things persist between reruns).
@@ -124,7 +131,7 @@ class DietRxApp:
                 # Initialize results display
                 results_display = ResultsDisplay()
                 
-                # NEW: Initialize analytics components
+                # Initialize analytics components
                 analytics_engine = AnalyticsEngine(db_manager)
                 analytics_dashboard = AnalyticsDashboard()
                 
@@ -157,34 +164,40 @@ class DietRxApp:
         try:
             components = st.session_state.components
             db_manager = components['db_manager']
-            
+            # streamlit will adda  spinner with this text.
+            # everything inside this block of code runs while the spinner is active, so the user knows something is loading
             with st.spinner("Initializing database..."):
                 
                 # Update database schema for FDA support
                 db_manager.update_interactions_table_for_fda()
                 
-                # Use your existing initialization
+                # fetches all foods and meds from db
                 medications = db_manager.get_all_medications()
                 foods = db_manager.get_all_foods()
                 
+                # builds two lists of only the names in string form and saves them in session state
+                # these are used later for dropdown menu, seach, autocomplete
                 st.session_state.medication_names = [med['name'] for med in medications]
                 st.session_state.food_names = [food['name'] for food in foods]
+                # marks a flag so the app knows the db is ready for use
                 st.session_state.db_populated = True
                 
+                # shows green success message on streamlit
                 st.success(f"""
                 Database initialized successfully!
                 """)
-                
+        # error catching in case anything goes wrong.         
         except Exception as e:
             st.error(f"Error during database initialization: {e}")
             logging.error(f"Database initialization error: {e}")
-    
+    # this method renders the sidebar
     def render_sidebar(self, components):
-        """Render application sidebar"""
+        # with sidebar just is streamlits way of creating a sidebar, every thing in this block will render in the sidebar
         with st.sidebar:
+            # adds a sidebar header
             st.header("App Status")
             
-            # Navigation - Keep this
+            # creates radio buttons for the page navigations
             st.subheader("Navigation")
             page = st.radio(
                 "Choose page:",
@@ -194,10 +207,12 @@ class DietRxApp:
                     "Test Fuzzy Matching", 
                     "Performance Monitor"
                 ],
+                # ensures streamlit remembers the last selected option across reruns
                 key="page_selector"
             )
             
-            # Update current page
+            # maps the chosen radio button to a string identifier stored in st.session_state.current_page
+            # later the app will check this variable to decide which page to display
             if page == "Search & Analyze":
                 st.session_state.current_page = 'search'
             elif page == "Analytics Dashboard":
@@ -207,16 +222,15 @@ class DietRxApp:
             elif page == "Performance Monitor":
                 st.session_state.current_page = 'performance'
             
+            # horizontal divider 
             st.markdown("---")
             
-            # Enhanced statistics display - Keep this
+            # Enhanced statistics display, helper function with more stats and buttons
             self._display_enhanced_sidebar_stats(components)
             
             st.markdown("---")
             
-            # ONLY KEEP ESSENTIAL ONGOING BUTTONS
-            
-            # Cache management - Keep this as it's useful ongoing
+            # Cache management button, if clicked clears the in memory cache so future queries reload fresh data
             if st.button("Refresh Cache"):
                 try:
                     components['cache_manager'].clear_memory_cache()
@@ -224,25 +238,22 @@ class DietRxApp:
                 except Exception as e:
                     st.error(f"Error refreshing cache: {e}")
             
-            # Database viewer - Keep this as it's useful for checking data
+            # Database viewer toggles the db info from pressing the button with a true false flag
             if st.button("View Database", help="View current interactions in database"):
                 st.session_state.show_database_viewer = not st.session_state.get('show_database_viewer', False)
             
-            # Show database viewer if toggled
+            # if flag is true Show database viewer
             if st.session_state.get('show_database_viewer', False):
                 self._display_database_viewer(components)
             
             st.markdown("---")
             
-            # Admin section - Only show if needed
+            # Admin section
             if st.session_state.get('show_admin_tools', False):
                 st.subheader("Admin Tools")
                 
                 if st.button("Fetch More FDA Data", help="Get additional FDA interactions"):
                     self._fetch_more_fda_data(components)
-                
-                if st.button("Clean Reset Database", help="Remove all data and start fresh"):
-                    self._reset_database(components)
                     
                 if st.button("Reset App"):
                     # Clear session state
@@ -255,25 +266,22 @@ class DietRxApp:
                     st.session_state.show_admin_tools = True
                     st.rerun()
 
-
-        
-    
+    # method to render the main search page
     def render_search_page(self, components):
-        """Render the main search and analyze page"""
-        
-        # Professional header without emojis
         st.title("Drug-Food Interaction Analysis")
         st.markdown("---")
         
+        # gets search innterface from the components tool box dict we made
         search_interface = components['search_interface']
         
-        # Medication search section
+        # Medication search section custom html
         st.markdown("""
         <div style="background-color: #bac4cf; border: 1px solid #e2e8f0; border-radius: 8px; padding: 1.5rem; margin: 1rem 0;">
             <h3 style="color: #374151; margin: 0 0 1rem 0;">Medication Selection</h3>
         </div>
         """, unsafe_allow_html=True)
         
+        # this method is where the actual search input widget autocomplete and dropdown is drawn for meds
         search_interface.render_medication_search()
         
         # Section divider
@@ -286,12 +294,15 @@ class DietRxApp:
         </div>
         """, unsafe_allow_html=True)
         
+        # this method is where the actual search input widget autocomplete and dropdown is drawn for foods
         search_interface.render_food_search()
         
         # Analysis section
         st.markdown('<div style="border-top: 1px solid #e2e8f0; margin: 2rem 0;"></div>', unsafe_allow_html=True)
         
+        # first asked search interface if we have any selections yet
         if search_interface.has_selections():
+            # if yes, we make two lists of foods and meds
             medications, foods = search_interface.get_selected_items()
             
             # Professional analysis header
@@ -301,7 +312,8 @@ class DietRxApp:
             </h2>
             """, unsafe_allow_html=True)
             
-            # Show what will be analyzed in professional format
+            # Show what will be analyzed in professional format. This is if both a med and food are selected
+            # then the user will see two boxes and an explanation of what the analysis will do when they run it
             if medications and foods:
                 st.markdown("""
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0;">
@@ -322,7 +334,7 @@ class DietRxApp:
                     based on current clinical evidence and pharmacological data.
                 </p>
                 """, unsafe_allow_html=True)
-                
+            # if only a medication is selected they will get a warning asking them to add a food    
             elif medications:
                 st.markdown("""
                 <div style="background-color: #fffbeb; border: 1px solid #fbbf24; border-radius: 8px; padding: 1rem; margin: 1rem 0;">
@@ -330,7 +342,7 @@ class DietRxApp:
                     <p style="color: #92400e; margin: 0;">Please select a food item to analyze with your medication.</p>
                 </div>
                 """, unsafe_allow_html=True)
-                
+            # if only a medication is selected they will get a warning asking them to add a med
             elif foods:
                 st.markdown("""
                 <div style="background-color: #fffbeb; border: 1px solid #fbbf24; border-radius: 8px; padding: 1rem; margin: 1rem 0;">
@@ -339,7 +351,9 @@ class DietRxApp:
                 </div>
                 """, unsafe_allow_html=True)
             
-            # Professional button styling - only show if both are selected
+            # if both are selected we get two evenly spaced buttons using columns
+            # one of the buttons runs the interaction analysis the other button resets selections
+            # st.rerun() restarts the streamlit script to refresh the UI
             if medications and foods:
                 col1, col2 = st.columns([1, 1])
                 
@@ -369,7 +383,7 @@ class DietRxApp:
                         st.rerun()
         
         else:
-            # Professional instruction message
+            # this else is for when nothing is selected, the user will see this blue info box
             st.markdown("""
             <div style="background-color: #f0f9ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 1.5rem; margin: 2rem 0; text-align: center;">
                 <h3 style="color: #1e40af; margin: 0 0 0.5rem 0;">Get Started</h3>
@@ -1211,9 +1225,9 @@ class DietRxApp:
             st.error(f"Error resetting database: {e}")
 
 
-    
+    # method basically says when my app runs heres the flow of what happens
+    # this is the main app entry point
     def run(self):
-        """Main application entry point"""
         
         # Additional CSS fixes for specific components
         st.markdown("""
@@ -1239,28 +1253,31 @@ class DietRxApp:
             </style>
             """, unsafe_allow_html=True)
 
-        # Initialize components
+        # Initialize components, calls the method we defined in the beginning where we create a tool box dict
         components = self.setup_components()
         if not components:
             st.error("Failed to initialize application. Please refresh the page.")
             st.stop()
         
         # Populate initial data if needed
+        # first run -> calls populate_initial_data() to load defaults
+        # Then sets a flag initialized = True so it won’t reload again on every click.
         if not st.session_state.initialized:
             self.populate_initial_data()
             st.session_state.initialized = True
         
-        # Render sidebar
+        # calls sidebar method to render it
         self.render_sidebar(components)
         
         # Render appropriate page based on selection
+        # default page is the search page
         page = st.session_state.get('current_page', 'search')
         
         if page == 'search':
             self.render_search_page(components)
-        elif page == 'analytics':           # NEW
+        elif page == 'analytics':           
             self.render_analytics_page(components)
-        elif page == 'performance':         # NEW
+        elif page == 'performance':        
             self.render_performance_page(components)
         elif page == 'test':
             self.render_test_page(components)
@@ -1272,6 +1289,7 @@ class DietRxApp:
 
 
 # Application entry point
+# wraps everything in error catching so errors dont silently crash the app
 def main():
     try:
         app = DietRxApp()
